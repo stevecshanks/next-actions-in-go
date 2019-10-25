@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -41,5 +42,6 @@ func actions(w http.ResponseWriter, req *http.Request) {
 func main() {
 	http.HandleFunc("/actions", actions)
 
+	fmt.Printf("Listening on port 8080\n")
 	http.ListenAndServe(":8080", nil)
 }
