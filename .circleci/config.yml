@@ -18,8 +18,17 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: npm test
+  api_tests:
+    docker:
+      - image: circleci/golang:1.13
+    working_directory: ~/repo/api
+    steps:
+      - checkout:
+          path: ~/repo
+      - run: go test
 workflows:
   version: 2
   everything:
     jobs:
       - frontend_tests
+      - api_tests
