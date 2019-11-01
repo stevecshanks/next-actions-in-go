@@ -30,10 +30,6 @@ func actions(w http.ResponseWriter, req *http.Request) {
 			ID:   "action1",
 			Name: "Some action",
 		},
-		Action{
-			ID:   "action2",
-			Name: "Another action",
-		},
 	}
 
 	json.NewEncoder(w).Encode(map[string][]Action{"data": dummyActions})

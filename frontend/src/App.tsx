@@ -7,6 +7,7 @@ interface Action {
 }
 
 const App: React.FC = () => {
+  throw Error("uhoh");
   const [actions, setActions] = useState<Action[]>([]);
 
   const fetchActions = () => {
