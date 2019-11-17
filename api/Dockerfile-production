@@ -1,0 +1,11 @@
+FROM golang:1.13
+
+WORKDIR /go/src/next-actions/api
+
+COPY . .
+
+RUN go build
+
+EXPOSE 8080
+
+CMD ["./api"]
