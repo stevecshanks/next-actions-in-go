@@ -10,7 +10,7 @@ const App: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
 
   const fetchActions = () => {
-    fetch("/actions")
+    fetch("api/actions")
       .then(response => response.json())
       .then(json => setActions(json.data))
       .catch(error => console.log("An error occurred:", error));

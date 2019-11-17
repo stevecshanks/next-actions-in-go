@@ -1,7 +1,10 @@
-.PHONY: dev install test 
+.PHONY: dev prod install test 
 
 dev:
-		docker-compose up
+	docker-compose up
+
+prod:
+	docker-compose -f docker-compose-production.yml -p next-actions-prod up
 
 install: frontend/node_modules
 

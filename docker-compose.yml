@@ -13,8 +13,8 @@ services:
     depends_on:
       - api
     ports:
-      - "3000:3000"
-      - "35729:35729"
+      - 3000:3000
+      - 35729:35729
     volumes:
       - ./frontend:/app
       - /app/node_modules
