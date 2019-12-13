@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+  api:
+    build:
+      context: api
+      dockerfile: Dockerfile-production
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile-production

@@ -2,17 +2,11 @@ version: "3.7"
 
 services:
   api:
-    build:
-      context: api
-      dockerfile: Dockerfile-production
     image: stevecshanks/next-actions-api:latest
     ports:
       - 8080:8080
     restart: always
   frontend:
-    build:
-      context: frontend
-      dockerfile: Dockerfile-production
     image: stevecshanks/next-actions-frontend:latest
     depends_on:
       - api

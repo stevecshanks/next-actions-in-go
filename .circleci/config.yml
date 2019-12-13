@@ -34,7 +34,10 @@ jobs:
       - setup_remote_docker
       - checkout:
           path: ~/repo
-      - run: make deploy
+      - run: mkdir -p ~/.ssh
+      - run: echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+      - run: chmod 644 ~/.ssh/known_hosts
+      - run: make build push deploy
 workflows:
   version: 2
   everything:
