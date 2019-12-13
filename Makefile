@@ -1,10 +1,18 @@
-.PHONY: dev prod install test 
+.PHONY: dev prod install test build push deploy
 
 dev:
 	docker-compose up
 
 prod:
 	docker-compose -f docker-compose-production.yml -p next-actions-prod up
+
+build:
+	docker-compose -f docker-compose-production.yml build
+
+push:
+	echo ${DOCKER_HUB_TOKEN} | docker login -u stevecshanks --password-stdin && docker-compose -f docker-compose-production.yml push
+
+deploy: build push
 
 install: frontend/node_modules
 
