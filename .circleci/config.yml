@@ -26,9 +26,25 @@ jobs:
       - checkout:
           path: ~/repo
       - run: go test
+  deploy:
+    docker:
+      - image: circleci/golang:1.13
+    working_directory: ~/repo
+    steps:
+      - setup_remote_docker
+      - checkout:
+          path: ~/repo
+      - run: make deploy
 workflows:
   version: 2
   everything:
     jobs:
       - frontend_tests
       - api_tests
+      - deploy:
+          requires:
+            - frontend_tests
+            - api_tests
+          filters:
+            branches:
+              only: master
