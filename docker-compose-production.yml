@@ -6,6 +6,10 @@ services:
     ports:
       - 8080:8080
     restart: always
+    environment:
+      - TRELLO_BASE_URL=https://api.trello.com/1
+      - TRELLO_KEY=${TRELLO_KEY}
+      - TRELLO_TOKEN=${TRELLO_TOKEN}
   frontend:
     image: stevecshanks/next-actions-frontend:latest
     depends_on:

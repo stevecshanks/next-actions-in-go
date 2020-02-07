@@ -8,6 +8,10 @@ services:
       - 8080:8080
     volumes:
       - ./api:/go/src/next-actions/api
+    environment:
+      - TRELLO_BASE_URL=https://api.trello.com/1
+      - TRELLO_KEY=${TRELLO_KEY}
+      - TRELLO_TOKEN=${TRELLO_TOKEN}
   frontend:
     build: frontend
     depends_on:
