@@ -11,7 +11,7 @@ build:
 
 push:
 	echo ${DOCKER_HUB_TOKEN} | docker login -u stevecshanks --password-stdin
-	docker-compose -f docker-compose-production.yml push
+	docker-compose -f docker-compose-production.yml -f docker-compose-production-build.yml push
 
 deploy:
 	echo ${DOCKER_HUB_TOKEN} | ssh docker-deploy@${DOCKER_SERVER} "docker login -u stevecshanks --password-stdin"
