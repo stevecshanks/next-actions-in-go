@@ -2,6 +2,8 @@
 
 ## Running in dev mode
 
+If you haven't already, copy `.env.example` to `.env` and set your environment variables.
+
 ```
 make dev
 ```
@@ -34,3 +36,5 @@ You'll also need to set some environment variables in CircleCI:
 - `DOCKER_HUB_TOKEN` - an access token for Docker Hub that can write to the relevant repositories
 - `DOCKER_SERVER` - the IP address or hostname for the server you want to deploy to
 - `SSH_KNOWN_HOSTS` - will be appended to the `~/.ssh/known_hosts` file in CI to allow SSH access to your Docker server without prompting to confirm the identity of the host. Can be generated using `ssh-keyscan $DOCKER_SERVER`
+
+Finally, on the server copy `.env.example` to `.env` and set your environment variables.

@@ -1,7 +1,7 @@
 .PHONY: dev prod install test build push deploy
 
 dev:
-	docker-compose up
+	source .env && docker-compose up
 
 prod: build
 	docker-compose -f docker-compose-production.yml
@@ -11,13 +11,13 @@ build:
 
 push:
 	echo ${DOCKER_HUB_TOKEN} | docker login -u stevecshanks --password-stdin
-	docker-compose -f docker-compose-production.yml push
+	docker-compose -f docker-compose-production.yml -f docker-compose-production-build.yml push
 
 deploy:
 	echo ${DOCKER_HUB_TOKEN} | ssh docker-deploy@${DOCKER_SERVER} "docker login -u stevecshanks --password-stdin"
 	ssh docker-deploy@${DOCKER_SERVER} "docker-compose -f docker-compose-production.yml down --rmi all --remove-orphans || true"
 	scp docker-compose-production.yml docker-deploy@${DOCKER_SERVER}:~/docker-compose-production.yml
-	ssh docker-deploy@${DOCKER_SERVER} "docker-compose -f docker-compose-production.yml pull && docker-compose -f docker-compose-production.yml up --no-build -d"
+	ssh docker-deploy@${DOCKER_SERVER} "source .env && docker-compose -f docker-compose-production.yml pull && docker-compose -f docker-compose-production.yml up --no-build -d"
 
 install: frontend/node_modules
 
