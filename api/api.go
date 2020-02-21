@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
-	"os"
 
+	"next-actions/api/config"
 	"next-actions/api/trello"
 )
 
@@ -34,11 +33,15 @@ func handleError(w http.ResponseWriter, err error) {
 }
 
 func actions(w http.ResponseWriter, req *http.Request) {
-	baseURL, err := url.Parse(os.Getenv("TRELLO_BASE_URL"))
+	config, err := config.FromEnvironment()
 	if err != nil {
 		handleError(w, err)
 	}
-	client := trello.Client{BaseURL: baseURL, Key: os.Getenv("TRELLO_KEY"), Token: os.Getenv("TRELLO_TOKEN")}
+	client := trello.Client{
+		BaseURL: config.TrelloBaseURL,
+		Key:     config.TrelloKey,
+		Token:   config.TrelloToken,
+	}
 
 	cards, err := client.ListOwnedCards()
 	if err != nil {
