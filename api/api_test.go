@@ -2,42 +2,20 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"next-actions/api/trello"
 	"os"
 	"testing"
 )
 
 func TestActions(t *testing.T) {
-	trelloKey := "my_trello_key"
-	trelloToken := "my_trello_token"
-
-	mockHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/members/me/cards" {
-			t.Errorf("Mock server called with incorrect URL path: %s", r.URL.Path)
-		}
-		if r.URL.Query().Get("key") != trelloKey {
-			t.Errorf("Mock server called with incorrect key: %s", r.URL.Query().Get("key"))
-		}
-		if r.URL.Query().Get("token") != trelloToken {
-			t.Errorf("Mock server called with incorrect token: %s", r.URL.Query().Get("token"))
-		}
-
-		json, err := ioutil.ReadFile("fixtures/my_cards_response.json")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		w.Write(json)
-	})
-
-	server := httptest.NewServer(mockHandler)
-	defer server.Close()
+	server, teardown := trello.CreateMockServer(t, "some key", "some token")
+	defer teardown()
 
 	os.Setenv("TRELLO_BASE_URL", fmt.Sprintf("http://%s", server.Listener.Addr().String()))
-	os.Setenv("TRELLO_KEY", trelloKey)
-	os.Setenv("TRELLO_TOKEN", trelloToken)
+	os.Setenv("TRELLO_KEY", "some key")
+	os.Setenv("TRELLO_TOKEN", "some token")
 
 	defer os.Setenv("TRELLO_BASE_URL", "")
 	defer os.Setenv("TRELLO_KEY", "")
