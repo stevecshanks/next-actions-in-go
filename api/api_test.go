@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"next-actions/api/config"
 	"next-actions/api/trello"
-	"os"
 	"testing"
 )
 
@@ -13,13 +13,8 @@ func TestActions(t *testing.T) {
 	server, teardown := trello.CreateMockServer(t, "some key", "some token")
 	defer teardown()
 
-	os.Setenv("TRELLO_BASE_URL", fmt.Sprintf("http://%s", server.Listener.Addr().String()))
-	os.Setenv("TRELLO_KEY", "some key")
-	os.Setenv("TRELLO_TOKEN", "some token")
-
-	defer os.Setenv("TRELLO_BASE_URL", "")
-	defer os.Setenv("TRELLO_KEY", "")
-	defer os.Setenv("TRELLO_TOKEN", "")
+	config.SetupEnvironment(fmt.Sprintf("http://%s", server.Listener.Addr().String()), "some key", "some token")
+	defer config.TeardownEnvironment()
 
 	req, err := http.NewRequest("GET", "/actions", nil)
 	if err != nil {
