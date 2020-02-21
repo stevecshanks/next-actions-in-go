@@ -27,7 +27,7 @@ frontend/node_modules: frontend/package.json
 test: go_tests frontend_tests
 
 go_tests:
-	cd api && go test
+	cd api && go test ./...
 
 frontend_tests: install
 	cd frontend && CI=true npm test
