@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
+
+	"next-actions/api/trello"
 )
 
 // Action represents a "next action" in GTD
@@ -25,37 +28,20 @@ func (a *Action) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// Card represents a Trello card returned via the API
-type Card struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
 func handleError(w http.ResponseWriter, err error) {
 	fmt.Printf("Error: %s\n", err)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
 func actions(w http.ResponseWriter, req *http.Request) {
-	client := &http.Client{}
-
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/members/me/cards", os.Getenv("TRELLO_BASE_URL")), nil)
+	baseURL, err := url.Parse(os.Getenv("TRELLO_BASE_URL"))
 	if err != nil {
 		handleError(w, err)
 	}
+	client := trello.Client{BaseURL: baseURL, Key: os.Getenv("TRELLO_KEY"), Token: os.Getenv("TRELLO_TOKEN")}
 
-	queryParameters := req.URL.Query()
-	queryParameters.Add("key", os.Getenv("TRELLO_KEY"))
-	queryParameters.Add("token", os.Getenv("TRELLO_TOKEN"))
-	req.URL.RawQuery = queryParameters.Encode()
-
-	resp, err := client.Do(req)
+	cards, err := client.ListOwnedCards()
 	if err != nil {
-		handleError(w, err)
-	}
-
-	cards := make([]Card, 0)
-	if err := json.NewDecoder(resp.Body).Decode(&cards); err != nil {
 		handleError(w, err)
 	}
 
