@@ -10,6 +10,7 @@ services:
       - TRELLO_BASE_URL=https://api.trello.com/1
       - TRELLO_KEY=${TRELLO_KEY}
       - TRELLO_TOKEN=${TRELLO_TOKEN}
+      - TRELLO_NEXT_ACTIONS_LIST_ID=${TRELLO_NEXT_ACTIONS_LIST_ID}
   frontend:
     image: stevecshanks/next-actions-frontend:latest
     depends_on:

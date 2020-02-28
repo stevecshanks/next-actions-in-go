@@ -43,3 +43,34 @@ func TestClientListOwnedCardsReturnsExpectedResponse(t *testing.T) {
 		t.Errorf(fmt.Sprintf("ListOwnedCards returned incorrect card, expected %+v got %+v", expectedCard2, cards[1]))
 	}
 }
+
+func TestClientListCardsOnList(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	bytes, err := ioutil.ReadFile("./testdata/next_actions_list_response.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	httpmock.RegisterResponderWithQuery(
+		"GET",
+		"https://api.trello.com/1/lists/123/cards",
+		"key=some+key&token=some+token",
+		httpmock.NewBytesResponder(200, bytes),
+	)
+
+	baseURL, _ := url.Parse("https://api.trello.com/1")
+	client := Client{baseURL, "some key", "some token"}
+
+	cards, err := client.ListCardsOnList("123")
+	if err != nil {
+		t.Errorf("ListCardsOnList returned error: %s", err)
+	}
+	if len(cards) != 1 {
+		t.Errorf("ListCardsOnList returned %d cards, expected %d", len(cards), 2)
+	}
+	expectedCard1 := Card{"333333333333333333333333", "My Third Card"}
+	if cards[0] != expectedCard1 {
+		t.Errorf(fmt.Sprintf("ListCardsOnList returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))
+	}
+}

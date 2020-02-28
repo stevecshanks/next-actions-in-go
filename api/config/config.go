@@ -8,9 +8,10 @@ import (
 
 // Config represents a configuration for the app
 type Config struct {
-	TrelloBaseURL *url.URL
-	TrelloKey     string
-	TrelloToken   string
+	TrelloBaseURL           *url.URL
+	TrelloKey               string
+	TrelloToken             string
+	TrelloNextActionsListID string
 }
 
 // FromEnvironment creates a Config from environment variables
@@ -34,10 +35,16 @@ func FromEnvironment() (*Config, error) {
 		return nil, err
 	}
 
+	trelloNextActionsListID, err := requiredEnvironmentVariable("TRELLO_NEXT_ACTIONS_LIST_ID")
+	if err != nil {
+		return nil, err
+	}
+
 	return &Config{
-		TrelloBaseURL: trelloBaseURL,
-		TrelloKey:     trelloKey,
-		TrelloToken:   trelloToken,
+		TrelloBaseURL:           trelloBaseURL,
+		TrelloKey:               trelloKey,
+		TrelloToken:             trelloToken,
+		TrelloNextActionsListID: trelloNextActionsListID,
 	}, nil
 }
 

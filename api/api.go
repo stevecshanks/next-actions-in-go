@@ -43,13 +43,17 @@ func actions(w http.ResponseWriter, req *http.Request) {
 		Token:   config.TrelloToken,
 	}
 
-	cards, err := client.ListOwnedCards()
+	ownedCards, err := client.ListOwnedCards()
+	if err != nil {
+		handleError(w, err)
+	}
+	nextActionListCards, err := client.ListCardsOnList(config.TrelloNextActionsListID)
 	if err != nil {
 		handleError(w, err)
 	}
 
 	actions := make([]Action, 0)
-	for _, card := range cards {
+	for _, card := range append(ownedCards, nextActionListCards...) {
 		actions = append(actions, Action{card.ID, card.Name})
 	}
 
