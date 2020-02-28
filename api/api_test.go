@@ -1,41 +1,20 @@
 package main
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/jarcoal/httpmock"
-
 	"github.com/stevecshanks/next-actions-in-go/api/config"
+	"github.com/stevecshanks/next-actions-in-go/api/trello"
 )
 
 func TestActions(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
+	mockServer := trello.CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	defer trello.TeardownMockServer()
 
-	bytes, err := ioutil.ReadFile("./trello/testdata/my_cards_response.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-	httpmock.RegisterResponderWithQuery(
-		"GET",
-		"https://api.trello.com/1/members/me/cards",
-		"key=some+key&token=some+token",
-		httpmock.NewBytesResponder(200, bytes),
-	)
-
-	bytes, err = ioutil.ReadFile("./trello/testdata/next_actions_list_response.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-	httpmock.RegisterResponderWithQuery(
-		"GET",
-		"https://api.trello.com/1/lists/nextActionsList123/cards",
-		"key=some+key&token=some+token",
-		httpmock.NewBytesResponder(200, bytes),
-	)
+	mockServer.AddFileResponse("members/me/cards", "./trello/testdata/my_cards_response.json")
+	mockServer.AddFileResponse("lists/nextActionsList123/cards", "./trello/testdata/next_actions_list_response.json")
 
 	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123")
 	defer config.TeardownEnvironment()

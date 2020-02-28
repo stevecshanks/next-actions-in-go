@@ -2,27 +2,15 @@ package trello
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"testing"
-
-	"github.com/jarcoal/httpmock"
 )
 
 func TestClientListOwnedCardsReturnsExpectedResponse(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
+	mockServer := CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	defer TeardownMockServer()
 
-	bytes, err := ioutil.ReadFile("./testdata/my_cards_response.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-	httpmock.RegisterResponderWithQuery(
-		"GET",
-		"https://api.trello.com/1/members/me/cards",
-		"key=some+key&token=some+token",
-		httpmock.NewBytesResponder(200, bytes),
-	)
+	mockServer.AddFileResponse("members/me/cards", "./testdata/my_cards_response.json")
 
 	baseURL, _ := url.Parse("https://api.trello.com/1")
 	client := Client{baseURL, "some key", "some token"}
@@ -45,19 +33,10 @@ func TestClientListOwnedCardsReturnsExpectedResponse(t *testing.T) {
 }
 
 func TestClientListCardsOnList(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
+	mockServer := CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	defer TeardownMockServer()
 
-	bytes, err := ioutil.ReadFile("./testdata/next_actions_list_response.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-	httpmock.RegisterResponderWithQuery(
-		"GET",
-		"https://api.trello.com/1/lists/123/cards",
-		"key=some+key&token=some+token",
-		httpmock.NewBytesResponder(200, bytes),
-	)
+	mockServer.AddFileResponse("lists/123/cards", "./testdata/next_actions_list_response.json")
 
 	baseURL, _ := url.Parse("https://api.trello.com/1")
 	client := Client{baseURL, "some key", "some token"}
