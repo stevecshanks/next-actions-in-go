@@ -1,19 +1,32 @@
 package main
 
 import (
-	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"next-actions/api/config"
-	"next-actions/api/trello"
 	"testing"
+
+	"github.com/jarcoal/httpmock"
+
+	"github.com/stevecshanks/next-actions-in-go/api/config"
 )
 
 func TestActions(t *testing.T) {
-	server, teardown := trello.CreateMockServer(t, "some key", "some token")
-	defer teardown()
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
 
-	config.SetupEnvironment(fmt.Sprintf("http://%s", server.Listener.Addr().String()), "some key", "some token")
+	bytes, err := ioutil.ReadFile("./trello/testdata/my_cards_response.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	httpmock.RegisterResponderWithQuery(
+		"GET",
+		"https://api.trello.com/1/members/me/cards",
+		"key=some+key&token=some+token",
+		httpmock.NewBytesResponder(200, bytes),
+	)
+
+	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token")
 	defer config.TeardownEnvironment()
 
 	req, err := http.NewRequest("GET", "/actions", nil)

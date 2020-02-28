@@ -21,10 +21,10 @@ jobs:
   api_tests:
     docker:
       - image: circleci/golang:1.13
-    working_directory: /go/src/next-actions
+    working_directory: ~/repo
     steps:
       - checkout:
-          path: /go/src/next-actions
+          path: ~/repo
       - run: make go_tests
   deploy:
     docker:

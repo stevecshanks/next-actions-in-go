@@ -2,19 +2,30 @@ package trello
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/url"
 	"testing"
+
+	"github.com/jarcoal/httpmock"
 )
 
 func TestClientListOwnedCardsReturnsExpectedResponse(t *testing.T) {
-	trelloKey := "my_trello_key"
-	trelloToken := "my_trello_token"
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
 
-	server, teardown := CreateMockServer(t, trelloKey, trelloToken)
-	defer teardown()
+	bytes, err := ioutil.ReadFile("./testdata/my_cards_response.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	httpmock.RegisterResponderWithQuery(
+		"GET",
+		"https://api.trello.com/1/members/me/cards",
+		"key=some+key&token=some+token",
+		httpmock.NewBytesResponder(200, bytes),
+	)
 
-	baseURL, _ := url.Parse(server.URL)
-	client := Client{baseURL, trelloKey, trelloToken}
+	baseURL, _ := url.Parse("https://api.trello.com/1")
+	client := Client{baseURL, "some key", "some token"}
 
 	cards, err := client.ListOwnedCards()
 	if err != nil {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"next-actions/api/config"
-	"next-actions/api/trello"
+	"github.com/stevecshanks/next-actions-in-go/api/config"
+	"github.com/stevecshanks/next-actions-in-go/api/trello"
 )
 
 // Action represents a "next action" in GTD
