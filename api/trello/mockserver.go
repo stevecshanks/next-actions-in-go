@@ -2,37 +2,50 @@ package trello
 
 import (
 	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"path/filepath"
-	"testing"
+	"net/url"
+	"path"
+
+	"github.com/jarcoal/httpmock"
 )
 
-// CreateMockServer creates a mock Trello server that can be accessed via an HTTP client
-func CreateMockServer(t *testing.T, key string, token string) (*httptest.Server, func()) {
-	mockHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != OwnerCardsPath {
-			t.Errorf("Mock server called with incorrect URL path: %s", r.URL.Path)
-		}
-		if r.URL.Query().Get("key") != key {
-			t.Errorf("Mock server called with incorrect key: %s", r.URL.Query().Get("key"))
-		}
-		if r.URL.Query().Get("token") != token {
-			t.Errorf("Mock server called with incorrect token: %s", r.URL.Query().Get("token"))
-		}
+// MockServer allows configuring mock responses from a Trello server
+type MockServer struct {
+	BaseURL *url.URL
+	Key     string
+	Token   string
+}
 
-		json, err := ioutil.ReadFile(filepath.Join(os.Getenv("GOPATH"), "src/next-actions/api/trello/testdata/my_cards_response.json"))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		w.Write(json)
-	})
-
-	server := httptest.NewServer(mockHandler)
-
-	return server, func() {
-		server.Close()
+// CreateMockServer will create and activate a mock server
+func CreateMockServer(baseURL string, key string, token string) *MockServer {
+	httpmock.Activate()
+	parsedURL, err := url.Parse(baseURL)
+	if err != nil {
+		panic(err)
 	}
+	return &MockServer{parsedURL, key, token}
+}
+
+// TeardownMockServer will remove the mock server so HTTP responses will behave normally
+func TeardownMockServer() {
+	defer httpmock.DeactivateAndReset()
+}
+
+// AddFileResponse will return the contents of the specified file when the specified path on the mock server is
+// requested
+func (m *MockServer) AddFileResponse(urlPath string, filePath string) {
+	bytes, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	queryParameters := m.BaseURL.Query()
+	queryParameters.Add("key", m.Key)
+	queryParameters.Add("token", m.Token)
+
+	httpmock.RegisterResponderWithQuery(
+		"GET",
+		path.Join(m.BaseURL.Path, urlPath),
+		queryParameters.Encode(),
+		httpmock.NewBytesResponder(200, bytes),
+	)
 }
