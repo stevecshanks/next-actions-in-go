@@ -38,13 +38,22 @@ func (m *MockServer) AddFileResponse(urlPath string, filePath string) {
 		panic(err)
 	}
 
-	queryParameters := m.BaseURL.Query()
+	relativeURL, err := url.Parse(urlPath)
+	if err != nil {
+		panic(err)
+	}
+
+	queryParameters := relativeURL.Query()
 	queryParameters.Add("key", m.Key)
 	queryParameters.Add("token", m.Token)
 
+	fullURL := m.BaseURL.ResolveReference(&url.URL{
+		Path: path.Join(m.BaseURL.Path, relativeURL.Path),
+	})
+
 	httpmock.RegisterResponderWithQuery(
 		"GET",
-		path.Join(m.BaseURL.Path, urlPath),
+		fullURL.String(),
 		queryParameters.Encode(),
 		httpmock.NewBytesResponder(200, bytes),
 	)

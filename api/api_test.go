@@ -15,9 +15,10 @@ func TestActions(t *testing.T) {
 	mockServer := trello.CreateMockServer("https://api.trello.com/1", "some key", "some token")
 	defer trello.TeardownMockServer()
 
-	mockServer.AddFileResponse("members/me/cards", "./trello/testdata/my_cards_response.json")
-	mockServer.AddFileResponse("lists/nextActionsList123/cards", "./trello/testdata/next_actions_list_response.json")
-	mockServer.AddFileResponse("lists/projectsList456/cards", "./trello/testdata/next_actions_list_response.json")
+	mockServer.AddFileResponse(trello.OwnedCardsPath(), "./trello/testdata/my_cards_response.json")
+	mockServer.AddFileResponse(trello.CardsOnListPath("nextActionsList123"), "./trello/testdata/next_actions_list_response.json")
+	mockServer.AddFileResponse(trello.CardsOnListPath("projectsList456"), "./trello/testdata/projects_list_response.json")
+	mockServer.AddFileResponse(trello.ListsOnBoardPath("projectBoard789"), "./trello/testdata/board_lists_response.json")
 
 	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123", "projectsList456")
 	defer config.TeardownEnvironment()
@@ -45,8 +46,8 @@ func TestActions(t *testing.T) {
 	}
 
 	info := httpmock.GetCallCountInfo()
-	if info["GET /1/lists/projectsList456/cards?key=some+key&token=some+token"] != 1 {
+	if info["GET https://api.trello.com/1/boards/projectBoard789/lists?key=some+key&token=some+token"] != 1 {
 		fmt.Printf("%v+\n", info)
-		t.Errorf("Project list not hit")
+		t.Errorf("Project board not hit")
 	}
 }

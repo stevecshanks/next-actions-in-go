@@ -8,15 +8,30 @@ import (
 	"path"
 )
 
-// OwnedCardsPath is the path on the Trello API server where a list of owned cards can be queried
-const OwnedCardsPath = "/members/me/cards"
+// OwnedCardsPath returns the path on the Trello API server where a list of owned cards can be queried
+func OwnedCardsPath() string {
+	return "/members/me/cards"
+}
 
-// CardsOnListPathTemplate is a template for the path on the Trello API server where cards on a list can be queried
-// Needs to be formatted with the List ID
-const CardsOnListPathTemplate = "/lists/%s/cards"
+// CardsOnListPath returns the path on the Trello API server where cards on a list can be queried
+func CardsOnListPath(listID string) string {
+	return fmt.Sprintf("/lists/%s/cards", listID)
+}
+
+// ListsOnBoardPath returns the path on the Trello API server where lists on a board can be queried
+func ListsOnBoardPath(boardID string) string {
+	return fmt.Sprintf("/boards/%s/lists", boardID)
+}
 
 // Card represents a Trello card returned via the API
 type Card struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"desc"`
+}
+
+// List represents a Trello list returned via the API
+type List struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
@@ -28,14 +43,19 @@ type Client struct {
 	Token   string
 }
 
-// ListOwnedCards will return the cards this user is a member of
-func (c *Client) ListOwnedCards() ([]Card, error) {
-	return c.getCards(OwnedCardsPath)
+// OwnedCards will return the cards this user is a member of
+func (c *Client) OwnedCards() ([]Card, error) {
+	return c.getCards(OwnedCardsPath())
 }
 
-// ListCardsOnList will return the cards on the specified list
-func (c *Client) ListCardsOnList(listID string) ([]Card, error) {
-	return c.getCards(fmt.Sprintf(CardsOnListPathTemplate, listID))
+// CardsOnList will return the cards on the specified list
+func (c *Client) CardsOnList(listID string) ([]Card, error) {
+	return c.getCards(CardsOnListPath(listID))
+}
+
+// ListsOnBoard will return the lists on the specified board
+func (c *Client) ListsOnBoard(boardID string) ([]List, error) {
+	return c.getLists(ListsOnBoardPath(boardID))
 }
 
 func (c *Client) getCards(relativePath string) ([]Card, error) {
@@ -52,20 +72,41 @@ func (c *Client) getCards(relativePath string) ([]Card, error) {
 	return cards, nil
 }
 
-func (c *Client) get(relativePath string) (*http.Response, error) {
-	client := &http.Client{}
-
-	relativeURL := &url.URL{Path: path.Join(c.BaseURL.Path, relativePath)}
-	fullURL := c.BaseURL.ResolveReference(relativeURL)
-	req, err := http.NewRequest("GET", fullURL.String(), nil)
+func (c *Client) getLists(relativePath string) ([]List, error) {
+	resp, err := c.get(relativePath)
 	if err != nil {
 		return nil, err
 	}
 
-	queryParameters := req.URL.Query()
+	lists := make([]List, 0)
+	if err := json.NewDecoder(resp.Body).Decode(&lists); err != nil {
+		return nil, err
+	}
+
+	return lists, nil
+}
+
+func (c *Client) get(relativePath string) (*http.Response, error) {
+	client := &http.Client{}
+
+	relativeURL, err := url.Parse(relativePath)
+	if err != nil {
+		return nil, err
+	}
+
+	queryParameters := relativeURL.Query()
 	queryParameters.Add("key", c.Key)
 	queryParameters.Add("token", c.Token)
-	req.URL.RawQuery = queryParameters.Encode()
+
+	fullURL := c.BaseURL.ResolveReference(&url.URL{
+		Path:     path.Join(c.BaseURL.Path, relativeURL.Path),
+		RawQuery: queryParameters.Encode(),
+	})
+
+	req, err := http.NewRequest("GET", fullURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return client.Do(req)
 }

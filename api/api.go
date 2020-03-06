@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/stevecshanks/next-actions-in-go/api/config"
 	"github.com/stevecshanks/next-actions-in-go/api/trello"
@@ -43,16 +44,30 @@ func actions(w http.ResponseWriter, req *http.Request) {
 		Token:   config.TrelloToken,
 	}
 
-	ownedCards, err := client.ListOwnedCards()
+	ownedCards, err := client.OwnedCards()
 	if err != nil {
 		handleError(w, err)
 	}
-	nextActionListCards, err := client.ListCardsOnList(config.TrelloNextActionsListID)
+	nextActionListCards, err := client.CardsOnList(config.TrelloNextActionsListID)
 	if err != nil {
 		handleError(w, err)
 	}
 
-	client.ListCardsOnList(config.TrelloProjectsListID)
+	projectCards, err := client.CardsOnList(config.TrelloProjectsListID)
+	if err != nil {
+		handleError(w, err)
+	}
+
+	// Note: This is NOT the same as the API base URL
+	boardsURLPath := "https://trello.com/b/"
+	boardIDRegex, err := regexp.Compile(regexp.QuoteMeta(boardsURLPath) + `(\w+).*`)
+	if err != nil {
+		handleError(w, err)
+	}
+	for _, projectCard := range projectCards {
+		projectBoardID := boardIDRegex.FindStringSubmatch(projectCard.Description)[1]
+		client.ListsOnBoard(projectBoardID)
+	}
 
 	actions := make([]Action, 0)
 	for _, card := range append(ownedCards, nextActionListCards...) {

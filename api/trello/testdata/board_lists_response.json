@@ -1,0 +1,20 @@
+[
+  {
+    "id": "555555555555555555555555",
+    "name": "Inbox",
+    "closed": false,
+    "idBoard": "555555555555555555555555",
+    "pos": 65535,
+    "subscribed": false,
+    "softLimit": null
+  },
+  {
+    "id": "666666666666666666666666",
+    "name": "Todo",
+    "closed": false,
+    "idBoard": "666666666666666666666666",
+    "pos": 131071,
+    "subscribed": false,
+    "softLimit": null
+  }
+]
