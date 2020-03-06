@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/jarcoal/httpmock"
 	"github.com/stevecshanks/next-actions-in-go/api/config"
 	"github.com/stevecshanks/next-actions-in-go/api/trello"
 )
@@ -15,8 +17,9 @@ func TestActions(t *testing.T) {
 
 	mockServer.AddFileResponse("members/me/cards", "./trello/testdata/my_cards_response.json")
 	mockServer.AddFileResponse("lists/nextActionsList123/cards", "./trello/testdata/next_actions_list_response.json")
+	mockServer.AddFileResponse("lists/projectsList456/cards", "./trello/testdata/next_actions_list_response.json")
 
-	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123")
+	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123", "projectsList456")
 	defer config.TeardownEnvironment()
 
 	req, err := http.NewRequest("GET", "/actions", nil)
@@ -39,5 +42,11 @@ func TestActions(t *testing.T) {
 		`]}` + "\n"
 	if rr.Body.String() != expected {
 		t.Errorf("/actions returned incorrect body:\nexpected: %v\nactual:   %v", expected, rr.Body.String())
+	}
+
+	info := httpmock.GetCallCountInfo()
+	if info["GET /1/lists/projectsList456/cards?key=some+key&token=some+token"] != 1 {
+		fmt.Printf("%v+\n", info)
+		t.Errorf("Project list not hit")
 	}
 }

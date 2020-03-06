@@ -12,6 +12,7 @@ type Config struct {
 	TrelloKey               string
 	TrelloToken             string
 	TrelloNextActionsListID string
+	TrelloProjectsListID    string
 }
 
 // FromEnvironment creates a Config from environment variables
@@ -40,11 +41,17 @@ func FromEnvironment() (*Config, error) {
 		return nil, err
 	}
 
+	trelloProjectsListID, err := requiredEnvironmentVariable("TRELLO_PROJECTS_LIST_ID")
+	if err != nil {
+		return nil, err
+	}
+
 	return &Config{
 		TrelloBaseURL:           trelloBaseURL,
 		TrelloKey:               trelloKey,
 		TrelloToken:             trelloToken,
 		TrelloNextActionsListID: trelloNextActionsListID,
+		TrelloProjectsListID:    trelloProjectsListID,
 	}, nil
 }
 

@@ -52,6 +52,8 @@ func actions(w http.ResponseWriter, req *http.Request) {
 		handleError(w, err)
 	}
 
+	client.ListCardsOnList(config.TrelloProjectsListID)
+
 	actions := make([]Action, 0)
 	for _, card := range append(ownedCards, nextActionListCards...) {
 		actions = append(actions, Action{card.ID, card.Name})

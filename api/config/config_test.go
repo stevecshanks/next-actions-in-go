@@ -7,7 +7,7 @@ import (
 )
 
 func TestFromEnvironmentReturnsValidConfig(t *testing.T) {
-	SetupEnvironment("http://some.url", "some key", "some token", "a list id")
+	SetupEnvironment("http://some.url", "some key", "some token", "next actions list id", "projects list id")
 	defer TeardownEnvironment()
 
 	config, err := FromEnvironment()
@@ -15,13 +15,20 @@ func TestFromEnvironmentReturnsValidConfig(t *testing.T) {
 		t.Errorf("Error returned from FromEnvironment: %s", err)
 	}
 	baseURL, _ := url.Parse("http://some.url")
-	if config.TrelloBaseURL.String() != baseURL.String() || config.TrelloKey != "some key" || config.TrelloToken != "some token" || config.TrelloNextActionsListID != "a list id" {
+
+	isValidConfig := config.TrelloBaseURL.String() == baseURL.String() &&
+		config.TrelloKey == "some key" &&
+		config.TrelloToken == "some token" &&
+		config.TrelloNextActionsListID == "next actions list id" &&
+		config.TrelloProjectsListID == "projects list id"
+
+	if !isValidConfig {
 		t.Errorf(fmt.Sprintf("Incorrect config returned from FromEnvironment: %+v", config))
 	}
 }
 
 func TestFromEnvironmentReturnsErrorIfTrelloBaseURLIsInvalid(t *testing.T) {
-	SetupEnvironment(":not a url", "a key", "a token", "a list id")
+	SetupEnvironment(":not a url", "a key", "a token", "next actions list id", "projects list id")
 	defer TeardownEnvironment()
 
 	_, err := FromEnvironment()
@@ -31,7 +38,7 @@ func TestFromEnvironmentReturnsErrorIfTrelloBaseURLIsInvalid(t *testing.T) {
 }
 
 func TestFromEnvironmentRequiresTrelloBaseURL(t *testing.T) {
-	SetupEnvironment("", "a key", "a token", "a list id")
+	SetupEnvironment("", "a key", "a token", "next actions list id", "projects list id")
 	defer TeardownEnvironment()
 
 	_, err := FromEnvironment()
@@ -41,7 +48,7 @@ func TestFromEnvironmentRequiresTrelloBaseURL(t *testing.T) {
 }
 
 func TestFromEnvironmentRequiresTrelloKey(t *testing.T) {
-	SetupEnvironment("http://some.url", "", "a token", "a list id")
+	SetupEnvironment("http://some.url", "", "a token", "a list id", "projects list id")
 	defer TeardownEnvironment()
 
 	_, err := FromEnvironment()
@@ -51,7 +58,7 @@ func TestFromEnvironmentRequiresTrelloKey(t *testing.T) {
 }
 
 func TestFromEnvironmentRequiresTrelloToken(t *testing.T) {
-	SetupEnvironment("http://some.url", "a key", "", "a list id")
+	SetupEnvironment("http://some.url", "a key", "", "next actions list id", "projects list id")
 	defer TeardownEnvironment()
 
 	_, err := FromEnvironment()
@@ -61,11 +68,21 @@ func TestFromEnvironmentRequiresTrelloToken(t *testing.T) {
 }
 
 func TestFromEnvironmentRequiresTrelloNextActionsListID(t *testing.T) {
-	SetupEnvironment("http://some.url", "a key", "a token", "")
+	SetupEnvironment("http://some.url", "a key", "a token", "", "projects list id")
 	defer TeardownEnvironment()
 
 	_, err := FromEnvironment()
 	if err == nil {
 		t.Errorf("FromEnvironment did not fail with missing TRELLO_NEXT_ACTIONS_LIST_ID: %s", err)
+	}
+}
+
+func TestFromEnvironmentRequiresTrelloProjectsListID(t *testing.T) {
+	SetupEnvironment("http://some.url", "a key", "a token", "next actions list id", "")
+	defer TeardownEnvironment()
+
+	_, err := FromEnvironment()
+	if err == nil {
+		t.Errorf("FromEnvironment did not fail with missing TRELLO_PROJECTS_LIST_ID: %s", err)
 	}
 }
