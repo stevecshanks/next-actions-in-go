@@ -22,11 +22,11 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 	if len(cards) != 2 {
 		t.Fatalf("OwnedCards returned %d cards, expected %d", len(cards), 2)
 	}
-	expectedCard1 := Card{"111111111111111111111111", "My First Card", ""}
+	expectedCard1 := Card{"myFirstCardId", "My First Card", ""}
 	if cards[0] != expectedCard1 {
 		t.Errorf(fmt.Sprintf("OwnedCards returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))
 	}
-	expectedCard2 := Card{"222222222222222222222222", "My Second Card", ""}
+	expectedCard2 := Card{"mySecondCardId", "My Second Card", ""}
 	if cards[1] != expectedCard2 {
 		t.Errorf(fmt.Sprintf("OwnedCards returned incorrect card, expected %+v got %+v", expectedCard2, cards[1]))
 	}
@@ -48,7 +48,7 @@ func TestClientCardsOnList(t *testing.T) {
 	if len(cards) != 1 {
 		t.Fatalf("CardsOnList returned %d cards, expected %d", len(cards), 2)
 	}
-	expectedCard1 := Card{"333333333333333333333333", "My Third Card", "a description"}
+	expectedCard1 := Card{"todoCardId", "Todo Card", "a description"}
 	if cards[0] != expectedCard1 {
 		t.Errorf(fmt.Sprintf("CardsOnList returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))
 	}
@@ -71,7 +71,7 @@ func TestClientListsOnBoard(t *testing.T) {
 		t.Fatalf("ListsOnBoard returned %d lists, expected %d", len(lists), 2)
 	}
 	expectedList1 := List{"inboxListId", "Inbox"}
-	expectedList2 := List{"projectTodoListId", "Todo"}
+	expectedList2 := List{"todoListId", "Todo"}
 	if lists[0] != expectedList1 {
 		t.Errorf(fmt.Sprintf("ListsOnBoard returned incorrect list, expected %+v got %+v", expectedList1, lists[0]))
 	}

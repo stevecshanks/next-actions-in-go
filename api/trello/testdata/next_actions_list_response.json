@@ -1,6 +1,6 @@
 [
   {
-    "id": "333333333333333333333333",
+    "id": "todoCardId",
     "checkItemStates": null,
     "closed": false,
     "dateLastActivity": "2020-02-27T21:46:45.202Z",
@@ -14,7 +14,7 @@
     "idAttachmentCover": null,
     "idLabels": [],
     "manualCoverAttachment": false,
-    "name": "My Third Card",
+    "name": "Todo Card",
     "pos": 300000,
     "shortLink": "cdef3456",
     "isTemplate": false,

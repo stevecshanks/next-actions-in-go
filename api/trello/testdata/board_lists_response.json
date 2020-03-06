@@ -9,7 +9,7 @@
     "softLimit": null
   },
   {
-    "id": "projectTodoListId",
+    "id": "todoListId",
     "name": "Todo",
     "closed": false,
     "idBoard": "666666666666666666666666",
