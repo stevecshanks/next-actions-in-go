@@ -64,13 +64,31 @@ func actions(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		handleError(w, err)
 	}
+
+	allCards := append(ownedCards, nextActionListCards...)
 	for _, projectCard := range projectCards {
 		projectBoardID := boardIDRegex.FindStringSubmatch(projectCard.Description)[1]
-		client.ListsOnBoard(projectBoardID)
+		projectLists, err := client.ListsOnBoard(projectBoardID)
+		if err != nil {
+			handleError(w, err)
+		}
+
+		for _, list := range projectLists {
+			if list.Name == "Todo" {
+				projectTodoListCards, err := client.CardsOnList(list.ID)
+				if err != nil {
+					handleError(w, err)
+				}
+				if len(projectTodoListCards) > 0 {
+					allCards = append(allCards, projectTodoListCards[0])
+				}
+				break
+			}
+		}
 	}
 
 	actions := make([]Action, 0)
-	for _, card := range append(ownedCards, nextActionListCards...) {
+	for _, card := range allCards {
 		actions = append(actions, Action{card.ID, card.Name})
 	}
 

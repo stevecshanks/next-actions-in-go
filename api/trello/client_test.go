@@ -70,8 +70,8 @@ func TestClientListsOnBoard(t *testing.T) {
 	if len(lists) != 2 {
 		t.Fatalf("ListsOnBoard returned %d lists, expected %d", len(lists), 2)
 	}
-	expectedList1 := List{"555555555555555555555555", "Inbox"}
-	expectedList2 := List{"666666666666666666666666", "Todo"}
+	expectedList1 := List{"inboxListId", "Inbox"}
+	expectedList2 := List{"projectTodoListId", "Todo"}
 	if lists[0] != expectedList1 {
 		t.Errorf(fmt.Sprintf("ListsOnBoard returned incorrect list, expected %+v got %+v", expectedList1, lists[0]))
 	}

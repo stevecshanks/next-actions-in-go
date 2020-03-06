@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/jarcoal/httpmock"
 	"github.com/stevecshanks/next-actions-in-go/api/config"
 	"github.com/stevecshanks/next-actions-in-go/api/trello"
 )
@@ -19,6 +17,7 @@ func TestActions(t *testing.T) {
 	mockServer.AddFileResponse(trello.CardsOnListPath("nextActionsList123"), "./trello/testdata/next_actions_list_response.json")
 	mockServer.AddFileResponse(trello.CardsOnListPath("projectsList456"), "./trello/testdata/projects_list_response.json")
 	mockServer.AddFileResponse(trello.ListsOnBoardPath("projectBoard789"), "./trello/testdata/board_lists_response.json")
+	mockServer.AddFileResponse(trello.CardsOnListPath("projectTodoListId"), "./trello/testdata/project_todo_list_cards_response.json")
 
 	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123", "projectsList456")
 	defer config.TeardownEnvironment()
@@ -39,15 +38,10 @@ func TestActions(t *testing.T) {
 	expected := `{"data":[` +
 		`{"type":"actions","id":"111111111111111111111111","name":"My First Card"},` +
 		`{"type":"actions","id":"222222222222222222222222","name":"My Second Card"},` +
-		`{"type":"actions","id":"333333333333333333333333","name":"My Third Card"}` +
+		`{"type":"actions","id":"333333333333333333333333","name":"My Third Card"},` +
+		`{"type":"actions","id":"777777777777777777777777","name":"My Project Card"}` +
 		`]}` + "\n"
 	if rr.Body.String() != expected {
 		t.Errorf("/actions returned incorrect body:\nexpected: %v\nactual:   %v", expected, rr.Body.String())
-	}
-
-	info := httpmock.GetCallCountInfo()
-	if info["GET https://api.trello.com/1/boards/projectBoard789/lists?key=some+key&token=some+token"] != 1 {
-		fmt.Printf("%v+\n", info)
-		t.Errorf("Project board not hit")
 	}
 }

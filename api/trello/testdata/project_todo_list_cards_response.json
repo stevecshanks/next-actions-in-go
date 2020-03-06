@@ -1,0 +1,58 @@
+[
+  {
+    "id": "777777777777777777777777",
+    "checkItemStates": null,
+    "closed": false,
+    "dateLastActivity": "2020-02-27T21:46:45.202Z",
+    "desc": "a description",
+    "descData": null,
+    "dueReminder": null,
+    "idBoard": "123456789012345678901234",
+    "idList": "123456789012345678901234",
+    "idMembersVoted": [],
+    "idShort": 30,
+    "idAttachmentCover": null,
+    "idLabels": [],
+    "manualCoverAttachment": false,
+    "name": "My Project Card",
+    "pos": 300000,
+    "shortLink": "fghi5678",
+    "isTemplate": false,
+    "badges": {
+      "attachmentsByType": {
+        "trello": {
+          "board": 0,
+          "card": 0
+        }
+      },
+      "location": false,
+      "votes": 0,
+      "viewingMemberVoted": false,
+      "subscribed": false,
+      "fogbugz": "",
+      "checkItems": 7,
+      "checkItemsChecked": 6,
+      "checkItemsEarliestDue": null,
+      "comments": 0,
+      "attachments": 0,
+      "description": false,
+      "due": null,
+      "dueComplete": false
+    },
+    "dueComplete": false,
+    "due": null,
+    "idChecklists": [],
+    "idMembers": [],
+    "labels": [],
+    "shortUrl": "https://trello.com/c/fghi5678",
+    "subscribed": false,
+    "url": "https://trello.com/c/fghi5678/55-my-project-card",
+    "cover": {
+      "idAttachment": null,
+      "color": null,
+      "idUploadedBackground": null,
+      "size": "normal",
+      "brightness": "light"
+    }
+  }
+]

@@ -1,6 +1,6 @@
 [
   {
-    "id": "555555555555555555555555",
+    "id": "inboxListId",
     "name": "Inbox",
     "closed": false,
     "idBoard": "555555555555555555555555",
@@ -9,7 +9,7 @@
     "softLimit": null
   },
   {
-    "id": "666666666666666666666666",
+    "id": "projectTodoListId",
     "name": "Todo",
     "closed": false,
     "idBoard": "666666666666666666666666",
