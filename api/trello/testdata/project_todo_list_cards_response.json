@@ -1,6 +1,6 @@
 [
   {
-    "id": "todoCardId",
+    "id": "firstProjectCardId",
     "checkItemStates": null,
     "closed": false,
     "dateLastActivity": "2020-02-27T21:46:45.202Z",
@@ -14,9 +14,9 @@
     "idAttachmentCover": null,
     "idLabels": [],
     "manualCoverAttachment": false,
-    "name": "Todo Card",
+    "name": "Project Card",
     "pos": 300000,
-    "shortLink": "cdef3456",
+    "shortLink": "fghi5678",
     "isTemplate": false,
     "badges": {
       "attachmentsByType": {
@@ -44,9 +44,9 @@
     "idChecklists": [],
     "idMembers": [],
     "labels": [],
-    "shortUrl": "https://trello.com/c/cdef3456",
+    "shortUrl": "https://trello.com/c/fghi5678",
     "subscribed": false,
-    "url": "https://trello.com/c/cdef3456/33-my-third-card",
+    "url": "https://trello.com/c/fghi5678/55-my-project-card",
     "cover": {
       "idAttachment": null,
       "color": null,

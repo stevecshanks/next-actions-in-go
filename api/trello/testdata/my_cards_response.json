@@ -1,6 +1,6 @@
 [
   {
-    "id": "111111111111111111111111",
+    "id": "myFirstCardId",
     "checkItemStates": null,
     "closed": false,
     "dateLastActivity": "2020-02-06T16:25:27.908Z",
@@ -56,7 +56,7 @@
     }
   },
   {
-    "id": "222222222222222222222222",
+    "id": "mySecondCardId",
     "checkItemStates": null,
     "closed": false,
     "dateLastActivity": "2020-01-12T22:16:06.923Z",
