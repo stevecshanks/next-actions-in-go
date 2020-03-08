@@ -3,7 +3,7 @@ package config
 import "os"
 
 // SetupEnvironment sets environment variables specified in the function
-func SetupEnvironment(trelloBaseURL string, trelloKey string, trelloToken string, trelloNextActionsListID string, trelloProjectsListID string) {
+func SetupEnvironment(trelloBaseURL, trelloKey, trelloToken, trelloNextActionsListID, trelloProjectsListID string) {
 	os.Setenv("TRELLO_BASE_URL", trelloBaseURL)
 	os.Setenv("TRELLO_KEY", trelloKey)
 	os.Setenv("TRELLO_TOKEN", trelloToken)

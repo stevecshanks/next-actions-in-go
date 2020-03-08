@@ -63,6 +63,7 @@ func (c *Client) getCards(relativePath string) ([]Card, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	cards := make([]Card, 0)
 	if err := json.NewDecoder(resp.Body).Decode(&cards); err != nil {
@@ -77,6 +78,7 @@ func (c *Client) getLists(relativePath string) ([]List, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	lists := make([]List, 0)
 	if err := json.NewDecoder(resp.Body).Decode(&lists); err != nil {
