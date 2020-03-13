@@ -16,7 +16,7 @@ type MockServer struct {
 }
 
 // CreateMockServer will create and activate a mock server
-func CreateMockServer(baseURL string, key string, token string) *MockServer {
+func CreateMockServer(baseURL, key, token string) *MockServer {
 	httpmock.Activate()
 	parsedURL, err := url.Parse(baseURL)
 	if err != nil {
@@ -32,7 +32,7 @@ func TeardownMockServer() {
 
 // AddFileResponse will return the contents of the specified file when the specified path on the mock server is
 // requested
-func (m *MockServer) AddFileResponse(urlPath string, filePath string) {
+func (m *MockServer) AddFileResponse(urlPath, filePath string) {
 	bytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		panic(err)

@@ -20,11 +20,12 @@ jobs:
       - run: npm test
   api_tests:
     docker:
-      - image: circleci/golang:1.13
+      - image: golangci/golangci-lint:v1.23.8
     working_directory: ~/repo
     steps:
       - checkout:
           path: ~/repo
+      - run: make go_lint
       - run: make go_tests
   deploy:
     docker:

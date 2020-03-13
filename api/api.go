@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 
@@ -34,26 +35,26 @@ func handleError(w http.ResponseWriter, err error) {
 }
 
 func actions(w http.ResponseWriter, req *http.Request) {
-	config, err := config.FromEnvironment()
+	cfg, err := config.FromEnvironment()
 	if err != nil {
 		handleError(w, err)
 	}
 	client := trello.Client{
-		BaseURL: config.TrelloBaseURL,
-		Key:     config.TrelloKey,
-		Token:   config.TrelloToken,
+		BaseURL: cfg.TrelloBaseURL,
+		Key:     cfg.TrelloKey,
+		Token:   cfg.TrelloToken,
 	}
 
 	ownedCards, err := client.OwnedCards()
 	if err != nil {
 		handleError(w, err)
 	}
-	nextActionListCards, err := client.CardsOnList(config.TrelloNextActionsListID)
+	nextActionListCards, err := client.CardsOnList(cfg.TrelloNextActionsListID)
 	if err != nil {
 		handleError(w, err)
 	}
 
-	projectCards, err := client.CardsOnList(config.TrelloProjectsListID)
+	projectCards, err := client.CardsOnList(cfg.TrelloProjectsListID)
 	if err != nil {
 		handleError(w, err)
 	}
@@ -92,12 +93,14 @@ func actions(w http.ResponseWriter, req *http.Request) {
 		actions = append(actions, Action{card.ID, card.Name})
 	}
 
-	json.NewEncoder(w).Encode(map[string][]Action{"data": actions})
+	if err := json.NewEncoder(w).Encode(map[string][]Action{"data": actions}); err != nil {
+		handleError(w, err)
+	}
 }
 
 func main() {
 	http.HandleFunc("/actions", actions)
 
 	fmt.Printf("Listening on port 8080\n")
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

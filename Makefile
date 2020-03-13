@@ -26,8 +26,13 @@ frontend/node_modules: frontend/package.json
 
 test: go_tests frontend_tests
 
+lint: go_lint
+
 go_tests:
 	cd api && go test ./...
+
+go_lint:
+	cd api && golangci-lint run
 
 frontend_tests: install
 	cd frontend && CI=true npm test
