@@ -89,6 +89,7 @@ func (c *Client) getLists(relativePath string) ([]List, error) {
 }
 
 func (c *Client) get(relativePath string) (*http.Response, error) {
+	fmt.Printf("Making request to %s\n", relativePath)
 	client := &http.Client{}
 
 	relativeURL, err := url.Parse(relativePath)
