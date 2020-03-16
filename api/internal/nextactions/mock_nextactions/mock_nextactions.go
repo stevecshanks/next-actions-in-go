@@ -47,3 +47,18 @@ func (mr *MockTrelloClientMockRecorder) OwnedCards() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OwnedCards", reflect.TypeOf((*MockTrelloClient)(nil).OwnedCards))
 }
+
+// CardsOnList mocks base method
+func (m *MockTrelloClient) CardsOnList(listID string) ([]trello.Card, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CardsOnList", listID)
+	ret0, _ := ret[0].([]trello.Card)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CardsOnList indicates an expected call of CardsOnList
+func (mr *MockTrelloClientMockRecorder) CardsOnList(listID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CardsOnList", reflect.TypeOf((*MockTrelloClient)(nil).CardsOnList), listID)
+}

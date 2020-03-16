@@ -64,21 +64,16 @@ func actions(w http.ResponseWriter, req *http.Request) {
 		Token:   cfg.TrelloToken,
 	}
 
-	fetcher := nextactions.Fetcher{Client: &client}
+	fetcher := nextactions.Fetcher{Client: &client, Config: cfg}
 
 	startTime := time.Now()
-
-	nextActionListCards, err := client.CardsOnList(cfg.TrelloNextActionsListID)
-	if err != nil {
-		handleError(w, err)
-	}
 
 	projectCards, err := client.CardsOnList(cfg.TrelloProjectsListID)
 	if err != nil {
 		handleError(w, err)
 	}
 
-	allCards := nextActionListCards
+	allCards := make([]trello.Card, 0)
 
 	projectListsChannel := make(chan []trello.List)
 	for _, projectCard := range projectCards {

@@ -1,13 +1,18 @@
 package nextactions
 
-import "github.com/stevecshanks/next-actions-in-go/api/internal/trello"
+import (
+	"github.com/stevecshanks/next-actions-in-go/api/internal/config"
+	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
+)
 
 type TrelloClient interface {
 	OwnedCards() ([]trello.Card, error)
+	CardsOnList(listID string) ([]trello.Card, error)
 }
 
 type Fetcher struct {
 	Client TrelloClient
+	Config *config.Config
 }
 
 func (f *Fetcher) Fetch() ([]Action, error) {
@@ -15,8 +20,13 @@ func (f *Fetcher) Fetch() ([]Action, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	allCards := ownedCards
+
+	nextActionsCards, err := f.Client.CardsOnList(f.Config.TrelloNextActionsListID)
+	if err != nil {
+		return nil, err
+	}
+	allCards = append(allCards, nextActionsCards...)
 
 	actions := make([]Action, 0)
 	for _, card := range allCards {
