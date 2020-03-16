@@ -81,12 +81,10 @@ func actions(w http.ResponseWriter, req *http.Request) {
 		Token:   cfg.TrelloToken,
 	}
 
+	fetcher := Fetcher{&client}
+
 	startTime := time.Now()
 
-	ownedCards, err := client.OwnedCards()
-	if err != nil {
-		handleError(w, err)
-	}
 	nextActionListCards, err := client.CardsOnList(cfg.TrelloNextActionsListID)
 	if err != nil {
 		handleError(w, err)
@@ -97,7 +95,7 @@ func actions(w http.ResponseWriter, req *http.Request) {
 		handleError(w, err)
 	}
 
-	allCards := append(ownedCards, nextActionListCards...)
+	allCards := nextActionListCards
 
 	projectListsChannel := make(chan []trello.List)
 	for _, projectCard := range projectCards {
@@ -116,9 +114,13 @@ func actions(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
+	actions, err := fetcher.Fetch()
+	if err != nil {
+		handleError(w, err)
+	}
+
 	fmt.Printf("Finished API requests, took %s\n", time.Since(startTime))
 
-	actions := make([]Action, 0)
 	for _, card := range allCards {
 		actions = append(actions, Action{card.ID, card.Name})
 	}
