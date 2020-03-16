@@ -8,27 +8,10 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/stevecshanks/next-actions-in-go/api/config"
-	"github.com/stevecshanks/next-actions-in-go/api/trello"
+	"github.com/stevecshanks/next-actions-in-go/api/internal/config"
+	"github.com/stevecshanks/next-actions-in-go/api/internal/nextactions"
+	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 )
-
-// Action represents a "next action" in GTD
-type Action struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
-// MarshalJSON adds fields required by JSON-API to an Action
-func (a *Action) MarshalJSON() ([]byte, error) {
-	type AliasedAction Action
-	return json.Marshal(&struct {
-		Type string `json:"type"`
-		*AliasedAction
-	}{
-		Type:          "actions",
-		AliasedAction: (*AliasedAction)(a),
-	})
-}
 
 func handleError(w http.ResponseWriter, err error) {
 	fmt.Printf("Error: %s\n", err)
@@ -81,7 +64,7 @@ func actions(w http.ResponseWriter, req *http.Request) {
 		Token:   cfg.TrelloToken,
 	}
 
-	fetcher := Fetcher{&client}
+	fetcher := nextactions.Fetcher{Client: &client}
 
 	startTime := time.Now()
 
@@ -122,10 +105,10 @@ func actions(w http.ResponseWriter, req *http.Request) {
 	fmt.Printf("Finished API requests, took %s\n", time.Since(startTime))
 
 	for _, card := range allCards {
-		actions = append(actions, Action{card.ID, card.Name})
+		actions = append(actions, nextactions.Action{ID: card.ID, Name: card.Name})
 	}
 
-	if err := json.NewEncoder(w).Encode(map[string][]Action{"data": actions}); err != nil {
+	if err := json.NewEncoder(w).Encode(map[string][]nextactions.Action{"data": actions}); err != nil {
 		handleError(w, err)
 	}
 }

@@ -1,17 +1,17 @@
-package main
+package nextactions
 
-import "github.com/stevecshanks/next-actions-in-go/api/trello"
+import "github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 
 type TrelloClient interface {
 	OwnedCards() ([]trello.Card, error)
 }
 
 type Fetcher struct {
-	client TrelloClient
+	Client TrelloClient
 }
 
 func (f *Fetcher) Fetch() ([]Action, error) {
-	ownedCards, err := f.client.OwnedCards()
+	ownedCards, err := f.Client.OwnedCards()
 	if err != nil {
 		return nil, err
 	}

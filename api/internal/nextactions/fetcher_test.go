@@ -1,10 +1,10 @@
-package main
+package nextactions
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/stevecshanks/next-actions-in-go/api/trello"
+	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 )
 
 type mockClient struct {
