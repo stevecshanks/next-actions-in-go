@@ -4,28 +4,27 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+
+	"github.com/stevecshanks/next-actions-in-go/api/internal/nextactions/mock_nextactions"
 	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 )
 
-type mockClient struct {
-	OwnedCardsReturn []trello.Card
-	OwnedCardsError  error
-}
-
-func (m *mockClient) OwnedCards() ([]trello.Card, error) {
-	return m.OwnedCardsReturn, m.OwnedCardsError
-}
-
 func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
+
+	ownedCards := []trello.Card{{ID: "an id", Name: "a name", Description: ""}}
+	mockClient.EXPECT().OwnedCards().Return(ownedCards, nil).AnyTimes()
+
+	fetcher := Fetcher{mockClient}
+	actions, err := fetcher.Fetch()
+
 	expectedActions := []Action{
 		{"an id", "a name"},
 	}
-
-	fetcher := Fetcher{&mockClient{
-		OwnedCardsReturn: []trello.Card{{ID: "an id", Name: "a name", Description: ""}},
-	}}
-
-	actions, err := fetcher.Fetch()
 
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
@@ -39,12 +38,15 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 }
 
 func TestErrorWithOwnedCardsReturnsError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
+
 	expectedError := fmt.Errorf("an error")
+	mockClient.EXPECT().OwnedCards().Return(nil, expectedError).AnyTimes()
 
-	fetcher := Fetcher{&mockClient{
-		OwnedCardsError: expectedError,
-	}}
-
+	fetcher := Fetcher{mockClient}
 	actions, err := fetcher.Fetch()
 
 	if err != expectedError {
