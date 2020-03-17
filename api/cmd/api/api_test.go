@@ -5,24 +5,30 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stevecshanks/next-actions-in-go/api/config"
-	"github.com/stevecshanks/next-actions-in-go/api/trello"
+	"github.com/stevecshanks/next-actions-in-go/api/internal/config"
+	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 )
 
 func TestActions(t *testing.T) {
 	mockServer := trello.CreateMockServer("https://api.trello.com/1", "some key", "some token")
 	defer trello.TeardownMockServer()
 
-	mockServer.AddFileResponse(trello.OwnedCardsPath(), "./trello/testdata/my_cards_response.json")
+	mockServer.AddFileResponse(trello.OwnedCardsPath(), "../../internal/trello/testdata/my_cards_response.json")
 	mockServer.AddFileResponse(
 		trello.CardsOnListPath("nextActionsList123"),
-		"./trello/testdata/next_actions_list_response.json",
+		"../../internal/trello/testdata/next_actions_list_response.json",
 	)
-	mockServer.AddFileResponse(trello.CardsOnListPath("projectsList456"), "./trello/testdata/projects_list_response.json")
-	mockServer.AddFileResponse(trello.ListsOnBoardPath("projectBoard789"), "./trello/testdata/board_lists_response.json")
+	mockServer.AddFileResponse(
+		trello.CardsOnListPath("projectsList456"),
+		"../../internal/trello/testdata/projects_list_response.json",
+	)
+	mockServer.AddFileResponse(
+		trello.ListsOnBoardPath("projectBoard789"),
+		"../../internal/trello/testdata/board_lists_response.json",
+	)
 	mockServer.AddFileResponse(
 		trello.CardsOnListPath("todoListId"),
-		"./trello/testdata/project_todo_list_cards_response.json",
+		"../../internal/trello/testdata/project_todo_list_cards_response.json",
 	)
 
 	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123", "projectsList456")
