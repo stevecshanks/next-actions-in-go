@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import Alert from "react-bootstrap/Alert";
+import ListGroup from "react-bootstrap/ListGroup";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 interface Action {
@@ -8,25 +11,26 @@ interface Action {
 
 const App: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
+  const [errorMessage, setErrorMessage] = useState<String | null>(null);
 
   const fetchActions = () => {
     fetch("api/actions")
       .then(response => response.json())
       .then(json => setActions(json.data))
-      .catch(error => console.log("An error occurred:", error));
+      .catch(() => setErrorMessage("An error occurred"));
   };
 
   useEffect(fetchActions, []);
 
   return (
-    <div>
-      <h1>Next Actions</h1>
-      <ul>
+    <>
+      {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+      <ListGroup>
         {actions.map((action: Action) => (
-          <li key={action.id}>{action.name}</li>
+          <ListGroup.Item key={action.id}>{action.name}</ListGroup.Item>
         ))}
-      </ul>
-    </div>
+      </ListGroup>
+    </>
   );
 };
 
