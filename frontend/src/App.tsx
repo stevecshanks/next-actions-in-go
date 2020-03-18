@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from "react";
 import Alert from "react-bootstrap/Alert";
-import ListGroup from "react-bootstrap/ListGroup";
+import { Action, NextActionsList } from "./NextActionsList";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-interface Action {
+type JsonAction = {
   id: string;
   name: string;
-}
+  dueBy?: string;
+};
+
+const actionsFromJson = (json: JsonAction[]): Action[] =>
+  json.map(action => ({
+    ...action,
+    dueBy: action.dueBy ? new Date(action.dueBy) : undefined,
+  }));
 
 const App: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
@@ -16,7 +23,7 @@ const App: React.FC = () => {
   const fetchActions = () => {
     fetch("api/actions")
       .then(response => response.json())
-      .then(json => setActions(json.data))
+      .then(json => setActions(actionsFromJson(json.data)))
       .catch(() => setErrorMessage("An error occurred"));
   };
 
@@ -25,11 +32,7 @@ const App: React.FC = () => {
   return (
     <>
       {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-      <ListGroup>
-        {actions.map((action: Action) => (
-          <ListGroup.Item key={action.id}>{action.name}</ListGroup.Item>
-        ))}
-      </ListGroup>
+      <NextActionsList actions={actions} />
     </>
   );
 };

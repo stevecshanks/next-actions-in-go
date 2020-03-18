@@ -3,32 +3,37 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
+	"path"
 	"testing"
 
 	"github.com/stevecshanks/next-actions-in-go/api/internal/config"
 	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 )
 
+func trelloResponse(fileName string) string {
+	return path.Join("../../internal/trello/testdata", fileName)
+}
+
 func TestActions(t *testing.T) {
 	mockServer := trello.CreateMockServer("https://api.trello.com/1", "some key", "some token")
 	defer trello.TeardownMockServer()
 
-	mockServer.AddFileResponse(trello.OwnedCardsPath(), "../../internal/trello/testdata/my_cards_response.json")
+	mockServer.AddFileResponse(trello.OwnedCardsPath(), trelloResponse("my_cards_response.json"))
 	mockServer.AddFileResponse(
 		trello.CardsOnListPath("nextActionsList123"),
-		"../../internal/trello/testdata/next_actions_list_response.json",
+		trelloResponse("next_actions_list_response.json"),
 	)
 	mockServer.AddFileResponse(
 		trello.CardsOnListPath("projectsList456"),
-		"../../internal/trello/testdata/projects_list_response.json",
+		trelloResponse("projects_list_response.json"),
 	)
 	mockServer.AddFileResponse(
 		trello.ListsOnBoardPath("projectBoard789"),
-		"../../internal/trello/testdata/board_lists_response.json",
+		trelloResponse("board_lists_response.json"),
 	)
 	mockServer.AddFileResponse(
 		trello.CardsOnListPath("todoListId"),
-		"../../internal/trello/testdata/project_todo_list_cards_response.json",
+		trelloResponse("project_todo_list_cards_response.json"),
 	)
 
 	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123", "projectsList456")
@@ -48,10 +53,10 @@ func TestActions(t *testing.T) {
 	}
 
 	expected := `{"data":[` +
-		`{"type":"actions","id":"myFirstCardId","name":"My First Card"},` +
-		`{"type":"actions","id":"mySecondCardId","name":"My Second Card"},` +
-		`{"type":"actions","id":"todoCardId","name":"Todo Card"},` +
-		`{"type":"actions","id":"firstProjectCardId","name":"Project Card"}` +
+		`{"type":"actions","id":"myFirstCardId","name":"My First Card","dueBy":"2020-02-12T16:24:00Z"},` +
+		`{"type":"actions","id":"mySecondCardId","name":"My Second Card","dueBy":null},` +
+		`{"type":"actions","id":"todoCardId","name":"Todo Card","dueBy":null},` +
+		`{"type":"actions","id":"firstProjectCardId","name":"Project Card","dueBy":null}` +
 		`]}` + "\n"
 	if rr.Body.String() != expected {
 		t.Errorf("/actions returned incorrect body:\nexpected: %v\nactual:   %v", expected, rr.Body.String())

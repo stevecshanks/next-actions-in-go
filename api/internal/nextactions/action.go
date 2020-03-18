@@ -1,11 +1,15 @@
 package nextactions
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 // Action represents a "next action" in GTD
 type Action struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID    string     `json:"id"`
+	Name  string     `json:"name"`
+	DueBy *time.Time `json:"dueBy"`
 }
 
 // MarshalJSON adds fields required by JSON-API to an Action

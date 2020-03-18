@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"time"
 )
 
 // OwnedCardsPath returns the path on the Trello API server where a list of owned cards can be queried
@@ -25,9 +26,10 @@ func ListsOnBoardPath(boardID string) string {
 
 // Card represents a Trello card returned via the API
 type Card struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"desc"`
+	ID          string     `json:"id"`
+	Name        string     `json:"name"`
+	Description string     `json:"desc"`
+	DueBy       *time.Time `json:"due"`
 }
 
 // List represents a Trello list returned via the API
