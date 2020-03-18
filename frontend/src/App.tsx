@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Alert from "react-bootstrap/Alert";
-import ListGroup from "react-bootstrap/ListGroup";
+import { Action, NextActionsList } from "./NextActionsList";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-
-interface Action {
-  id: string;
-  name: string;
-}
 
 const App: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
@@ -25,11 +20,7 @@ const App: React.FC = () => {
   return (
     <>
       {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-      <ListGroup>
-        {actions.map((action: Action) => (
-          <ListGroup.Item key={action.id}>{action.name}</ListGroup.Item>
-        ))}
-      </ListGroup>
+      <NextActionsList actions={actions} />
     </>
   );
 };

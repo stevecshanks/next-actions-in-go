@@ -9,9 +9,10 @@ test("renders the actions returned by the API", async () => {
       {
         type: "actions",
         id: "12345",
-        name: "An action"
-      }
-    ]
+        name: "An action",
+        dueBy: null,
+      },
+    ],
   };
   fetchMock.mockResponse(JSON.stringify(response));
 
