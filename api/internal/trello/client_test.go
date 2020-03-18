@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"testing"
+	"time"
 )
 
 func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
@@ -22,11 +23,24 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 	if len(cards) != 2 {
 		t.Fatalf("OwnedCards returned %d cards, expected %d", len(cards), 2)
 	}
-	expectedCard1 := Card{"myFirstCardId", "My First Card", ""}
-	if cards[0] != expectedCard1 {
+	expectedDueBy, _ := time.Parse(time.RFC3339, "2020-02-12T16:24:00.000Z")
+	expectedCard1 := Card{
+		ID:          "myFirstCardId",
+		Name:        "My First Card",
+		Description: "",
+		DueBy:       &expectedDueBy,
+	}
+	if cards[0].ID != expectedCard1.ID ||
+		cards[0].Name != expectedCard1.Name ||
+		cards[0].Description != expectedCard1.Description ||
+		!cards[0].DueBy.Equal(*expectedCard1.DueBy) {
 		t.Errorf(fmt.Sprintf("OwnedCards returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))
 	}
-	expectedCard2 := Card{"mySecondCardId", "My Second Card", ""}
+	expectedCard2 := Card{
+		ID:          "mySecondCardId",
+		Name:        "My Second Card",
+		Description: "",
+	}
 	if cards[1] != expectedCard2 {
 		t.Errorf(fmt.Sprintf("OwnedCards returned incorrect card, expected %+v got %+v", expectedCard2, cards[1]))
 	}
@@ -48,7 +62,11 @@ func TestClientCardsOnList(t *testing.T) {
 	if len(cards) != 1 {
 		t.Fatalf("CardsOnList returned %d cards, expected %d", len(cards), 2)
 	}
-	expectedCard1 := Card{"todoCardId", "Todo Card", "a description"}
+	expectedCard1 := Card{
+		ID:          "todoCardId",
+		Name:        "Todo Card",
+		Description: "a description",
+	}
 	if cards[0] != expectedCard1 {
 		t.Errorf(fmt.Sprintf("CardsOnList returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))
 	}

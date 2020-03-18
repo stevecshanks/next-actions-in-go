@@ -138,7 +138,11 @@ func getTodoList(lists []trello.List) (*trello.List, error) {
 func cardsToActions(cards []trello.Card) []Action {
 	actions := make([]Action, 0)
 	for _, card := range cards {
-		actions = append(actions, Action{card.ID, card.Name})
+		actions = append(actions, Action{
+			ID:    card.ID,
+			Name:  card.Name,
+			DueBy: card.DueBy,
+		})
 	}
 	return actions
 }

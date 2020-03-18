@@ -3,6 +3,7 @@ package nextactions
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 
@@ -32,7 +33,7 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{"an id", "a name"},
+		{ID: "an id", Name: "a name"},
 	}
 
 	if err != nil {
@@ -81,7 +82,7 @@ func TestCardsInNextActionsListAreReturnedAsActions(t *testing.T) {
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{"an id", "a name"},
+		{ID: "an id", Name: "a name"},
 	}
 
 	if err != nil {
@@ -281,7 +282,36 @@ func TestFirstTodoListItemsAreReturnedAsActions(t *testing.T) {
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{"an id", "a name"},
+		{ID: "an id", Name: "a name"},
+	}
+
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+	}
+	if len(expectedActions) != len(actions) {
+		t.Errorf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
+	}
+	if expectedActions[0] != actions[0] {
+		t.Errorf("Incorrect actions returned, expected %+v but got %+v", expectedActions, actions)
+	}
+}
+
+func TestCardDueByDateIsAddedToActions(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
+
+	dueBy, _ := time.Parse(time.RFC3339, "2020-02-12T16:24:00.000Z")
+	ownedCards := []trello.Card{{ID: "an id", Name: "a name", Description: "", DueBy: &dueBy}}
+	mockClient.EXPECT().OwnedCards().Return(ownedCards, nil).AnyTimes()
+	mockClient.EXPECT().CardsOnList(gomock.Any()).Return([]trello.Card{}, nil).AnyTimes()
+
+	fetcher := Fetcher{mockClient, testConfig()}
+	actions, err := fetcher.Fetch()
+
+	expectedActions := []Action{
+		{ID: "an id", Name: "a name", DueBy: &dueBy},
 	}
 
 	if err != nil {
