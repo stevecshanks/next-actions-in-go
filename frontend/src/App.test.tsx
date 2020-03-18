@@ -20,3 +20,12 @@ test("renders the actions returned by the API", async () => {
   const action = await findByText("An action");
   expect(action).toBeInTheDocument();
 });
+
+test("renders an error if the API call fails", async () => {
+  fetchMock.mockReject();
+
+  const { findByText } = render(<App />);
+
+  const error = await findByText("An error occurred");
+  expect(error).toBeInTheDocument();
+});

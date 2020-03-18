@@ -8,12 +8,13 @@ interface Action {
 
 const App: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
+  const [errorMessage, setErrorMessage] = useState<String | null>(null);
 
   const fetchActions = () => {
     fetch("api/actions")
       .then(response => response.json())
       .then(json => setActions(json.data))
-      .catch(error => console.log("An error occurred:", error));
+      .catch(() => setErrorMessage("An error occurred"));
   };
 
   useEffect(fetchActions, []);
@@ -21,6 +22,7 @@ const App: React.FC = () => {
   return (
     <div>
       <h1>Next Actions</h1>
+      {errorMessage && <h2>{errorMessage}</h2>}
       <ul>
         {actions.map((action: Action) => (
           <li key={action.id}>{action.name}</li>
