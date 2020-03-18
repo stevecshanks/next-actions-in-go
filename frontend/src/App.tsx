@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import Alert from "react-bootstrap/Alert";
+import ListGroup from "react-bootstrap/ListGroup";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 interface Action {
@@ -20,15 +23,14 @@ const App: React.FC = () => {
   useEffect(fetchActions, []);
 
   return (
-    <div>
-      <h1>Next Actions</h1>
-      {errorMessage && <h2>{errorMessage}</h2>}
-      <ul>
+    <>
+      {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+      <ListGroup>
         {actions.map((action: Action) => (
-          <li key={action.id}>{action.name}</li>
+          <ListGroup.Item key={action.id}>{action.name}</ListGroup.Item>
         ))}
-      </ul>
-    </div>
+      </ListGroup>
+    </>
   );
 };
 
