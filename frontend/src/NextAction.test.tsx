@@ -12,3 +12,17 @@ test("displays action name", () => {
 
   expect(foundAction).toBeInTheDocument();
 });
+
+test("displays action due date", () => {
+  const anAction: Action = {
+    id: "1",
+    name: "An action",
+    dueBy: new Date(2020, 0, 15),
+  };
+
+  const { getByText } = render(<NextAction action={anAction} />);
+
+  const foundAction = getByText("1/15/2020");
+
+  expect(foundAction).toBeInTheDocument();
+});

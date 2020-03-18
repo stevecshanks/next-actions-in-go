@@ -5,6 +5,7 @@ import { NextAction } from "./NextAction";
 export interface Action {
   id: string;
   name: string;
+  dueBy?: Date;
 }
 
 type NextActionsListProps = {
