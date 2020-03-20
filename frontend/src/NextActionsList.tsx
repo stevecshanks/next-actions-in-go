@@ -12,12 +12,28 @@ type NextActionsListProps = {
   actions: Action[];
 };
 
+const maxDate = new Date(8640000000000000);
+
+const compareByDueDate = (a: Action, b: Action): number => {
+  const aDueBy = a.dueBy || maxDate;
+  const bDueBy = b.dueBy || maxDate;
+
+  return aDueBy.getTime() - bDueBy.getTime();
+};
+
+const sortActions = (actions: Action[]): Action[] =>
+  [...actions].sort(compareByDueDate);
+
 export const NextActionsList: React.FC<NextActionsListProps> = ({
   actions,
-}) => (
-  <ListGroup>
-    {actions.map((action: Action) => (
-      <NextAction key={action.id} action={action} />
-    ))}
-  </ListGroup>
-);
+}) => {
+  const sortedActions = sortActions(actions);
+
+  return (
+    <ListGroup>
+      {sortedActions.map((action: Action) => (
+        <NextAction key={action.id} action={action} />
+      ))}
+    </ListGroup>
+  );
+};
