@@ -13,7 +13,7 @@ beforeEach(() => MockDate.set(now));
 afterEach(() => MockDate.reset());
 
 test("displays action name", () => {
-  const anAction: Action = { id: "1", name: "An action" };
+  const anAction: Action = new Action({ id: "1", name: "An action" });
 
   const { getByText } = render(<NextAction action={anAction} />);
 
@@ -24,11 +24,11 @@ test("displays action name", () => {
 
 test("displays action due date", () => {
   const later = new Date(now.getTime() + twentyFourHours);
-  const anAction: Action = {
+  const anAction: Action = new Action({
     id: "1",
     name: "An action",
     dueBy: later,
-  };
+  });
 
   const { getByText } = render(<NextAction action={anAction} />);
 
@@ -41,11 +41,11 @@ test("displays action due date", () => {
 test("highlights overdue due dates", () => {
   const overdue = new Date(now.getTime() - oneSecond);
 
-  const overdueAction: Action = {
+  const overdueAction: Action = new Action({
     id: "1",
     name: "An overdue action",
     dueBy: overdue,
-  };
+  });
 
   const { getByText } = render(<NextAction action={overdueAction} />);
 
@@ -57,11 +57,11 @@ test("highlights overdue due dates", () => {
 test("highlights due dates in the near future", () => {
   const soon = new Date(now.getTime() + twentyFourHours - oneSecond);
 
-  const overdueAction: Action = {
+  const overdueAction: Action = new Action({
     id: "1",
     name: "An action due soon",
     dueBy: soon,
-  };
+  });
 
   const { getByText } = render(<NextAction action={overdueAction} />);
 

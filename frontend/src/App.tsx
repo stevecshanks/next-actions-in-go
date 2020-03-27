@@ -11,10 +11,13 @@ type JsonAction = {
 };
 
 const actionsFromJson = (json: JsonAction[]): Action[] =>
-  json.map(action => ({
-    ...action,
-    dueBy: action.dueBy ? new Date(action.dueBy) : undefined,
-  }));
+  json.map(
+    action =>
+      new Action({
+        ...action,
+        dueBy: action.dueBy ? new Date(action.dueBy) : undefined,
+      }),
+  );
 
 const App: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
