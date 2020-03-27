@@ -33,6 +33,12 @@ const App: React.FC = () => {
 
   useEffect(fetchActions, []);
 
+  const notificationCount = actions.filter(
+    action => action.isOverdue() || action.isDueSoon(),
+  ).length;
+  const notificationText = notificationCount ? `(${notificationCount}) ` : "";
+  document.title = `${notificationText}Next Actions`;
+
   return (
     <>
       {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
