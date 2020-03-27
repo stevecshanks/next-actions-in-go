@@ -7,18 +7,11 @@ type NextActionProps = {
   action: Action;
 };
 
-const twentyFourHours = 24 * 60 * 60 * 1000;
-
-const isPast = (dueBy: Date): boolean => dueBy.getTime() < Date.now();
-
-const isSoon = (dueBy: Date): boolean =>
-  dueBy.getTime() < Date.now() + twentyFourHours;
-
-const dateBadgeVariant = (dueBy: Date): BadgeProps["variant"] => {
-  if (isPast(dueBy)) {
+const dateBadgeVariant = (action: Action): BadgeProps["variant"] => {
+  if (action.isOverdue()) {
     return "danger";
   }
-  if (isSoon(dueBy)) {
+  if (action.isDueSoon()) {
     return "warning";
   }
   return "primary";
@@ -28,7 +21,7 @@ export const NextAction: React.FC<NextActionProps> = ({ action }) => (
   <ListGroup.Item>
     {action.name}
     {action.dueBy ? (
-      <Badge pill variant={dateBadgeVariant(action.dueBy)}>
+      <Badge pill variant={dateBadgeVariant(action)}>
         {action.dueBy.toLocaleDateString()}
       </Badge>
     ) : null}

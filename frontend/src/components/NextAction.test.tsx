@@ -4,11 +4,11 @@ import { render } from "@testing-library/react";
 import { Action } from "../models/Action";
 import { NextAction } from "./NextAction";
 
-const now = new Date(2020, 0, 15, 10, 30, 0);
-const oneSecond = 1000;
-const twentyFourHours = 24 * 60 * 60 * 1000;
+const NOW = new Date(2020, 0, 15, 10, 30, 0);
+const ONE_SECOND = 1000;
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
-beforeEach(() => MockDate.set(now));
+beforeEach(() => MockDate.set(NOW));
 
 afterEach(() => MockDate.reset());
 
@@ -23,7 +23,7 @@ test("displays action name", () => {
 });
 
 test("displays action due date", () => {
-  const later = new Date(now.getTime() + twentyFourHours);
+  const later = new Date(NOW.getTime() + TWENTY_FOUR_HOURS);
   const anAction: Action = new Action({
     id: "1",
     name: "An action",
@@ -39,7 +39,7 @@ test("displays action due date", () => {
 });
 
 test("highlights overdue due dates", () => {
-  const overdue = new Date(now.getTime() - oneSecond);
+  const overdue = new Date(NOW.getTime() - ONE_SECOND);
 
   const overdueAction: Action = new Action({
     id: "1",
@@ -55,7 +55,7 @@ test("highlights overdue due dates", () => {
 });
 
 test("highlights due dates in the near future", () => {
-  const soon = new Date(now.getTime() + twentyFourHours - oneSecond);
+  const soon = new Date(NOW.getTime() + TWENTY_FOUR_HOURS - ONE_SECOND);
 
   const overdueAction: Action = new Action({
     id: "1",
