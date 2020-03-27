@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Alert from "react-bootstrap/Alert";
-import { Action, NextActionsList } from "./NextActionsList";
+import { NextActionsList } from "./NextActionsList";
+import { Action } from "../models/Action";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
@@ -11,10 +12,13 @@ type JsonAction = {
 };
 
 const actionsFromJson = (json: JsonAction[]): Action[] =>
-  json.map(action => ({
-    ...action,
-    dueBy: action.dueBy ? new Date(action.dueBy) : undefined,
-  }));
+  json.map(
+    action =>
+      new Action({
+        ...action,
+        dueBy: action.dueBy ? new Date(action.dueBy) : undefined,
+      }),
+  );
 
 const App: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
@@ -28,6 +32,12 @@ const App: React.FC = () => {
   };
 
   useEffect(fetchActions, []);
+
+  const notificationCount = actions.filter(
+    action => action.isOverdue() || action.isDueSoon(),
+  ).length;
+  const notificationText = notificationCount ? `(${notificationCount}) ` : "";
+  document.title = `${notificationText}Next Actions`;
 
   return (
     <>
