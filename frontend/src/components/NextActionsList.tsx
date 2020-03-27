@@ -1,26 +1,7 @@
 import React from "react";
 import ListGroup from "react-bootstrap/ListGroup";
 import { NextAction } from "./NextAction";
-
-interface ActionArgs {
-  id: string;
-  name: string;
-  dueBy?: Date;
-}
-
-export class Action {
-  id: string;
-  name: string;
-  dueBy?: Date;
-
-  constructor(args: ActionArgs) {
-    const { id, name, dueBy } = args;
-
-    this.id = id;
-    this.name = name;
-    this.dueBy = dueBy;
-  }
-}
+import { Action } from "../models/Action";
 
 type NextActionsListProps = {
   actions: Action[];

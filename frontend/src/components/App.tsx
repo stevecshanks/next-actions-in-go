@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Alert from "react-bootstrap/Alert";
-import { Action, NextActionsList } from "./NextActionsList";
+import { NextActionsList } from "./NextActionsList";
+import { Action } from "../models/Action";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 

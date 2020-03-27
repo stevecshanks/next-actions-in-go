@@ -1,7 +1,7 @@
 import React from "react";
 import MockDate from "mockdate";
 import { render } from "@testing-library/react";
-import { Action } from "./NextActionsList";
+import { Action } from "../models/Action";
 import { NextAction } from "./NextAction";
 
 const now = new Date(2020, 0, 15, 10, 30, 0);

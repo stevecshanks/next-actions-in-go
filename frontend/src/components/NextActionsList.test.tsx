@@ -1,6 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import { Action, NextActionsList } from "./NextActionsList";
+import { NextActionsList } from "./NextActionsList";
+import { Action } from "../models/Action";
 
 test("renders the list of actions", () => {
   const actions: Action[] = [

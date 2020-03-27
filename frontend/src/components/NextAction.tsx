@@ -1,7 +1,7 @@
 import React from "react";
 import Badge, { BadgeProps } from "react-bootstrap/Badge";
 import ListGroup from "react-bootstrap/ListGroup";
-import { Action } from "./NextActionsList";
+import { Action } from "../models/Action";
 
 type NextActionProps = {
   action: Action;
