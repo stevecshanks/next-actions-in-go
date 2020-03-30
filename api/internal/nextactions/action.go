@@ -2,24 +2,38 @@ package nextactions
 
 import (
 	"encoding/json"
+	"net/url"
 	"time"
 )
+
+type URL struct {
+	url.URL
+}
+
+func (u *URL) MarshalJSON() ([]byte, error) {
+	return json.Marshal(u.URL.String())
+}
 
 // Action represents a "next action" in GTD
 type Action struct {
 	ID    string     `json:"id"`
 	Name  string     `json:"name"`
 	DueBy *time.Time `json:"dueBy"`
+	URL   url.URL    `json:"-"`
 }
 
-// MarshalJSON adds fields required by JSON-API to an Action
+type ActionAlias Action
+
 func (a *Action) MarshalJSON() ([]byte, error) {
-	type AliasedAction Action
-	return json.Marshal(&struct {
-		Type string `json:"type"`
-		*AliasedAction
-	}{
-		Type:          "actions",
-		AliasedAction: (*AliasedAction)(a),
+	return json.Marshal(JSONAction{
+		ActionAlias: ActionAlias(*a),
+		Type:        "actions",
+		URL:         a.URL.String(),
 	})
+}
+
+type JSONAction struct {
+	Type string `json:"type"` // Required by JSON-API
+	ActionAlias
+	URL string `json:"url"`
 }

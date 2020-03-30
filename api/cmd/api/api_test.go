@@ -53,10 +53,14 @@ func TestActions(t *testing.T) {
 	}
 
 	expected := `{"data":[` +
-		`{"type":"actions","id":"myFirstCardId","name":"My First Card","dueBy":"2020-02-12T16:24:00Z"},` +
-		`{"type":"actions","id":"mySecondCardId","name":"My Second Card","dueBy":null},` +
-		`{"type":"actions","id":"todoCardId","name":"Todo Card","dueBy":null},` +
-		`{"type":"actions","id":"firstProjectCardId","name":"Project Card","dueBy":null}` +
+		`{"type":"actions","id":"myFirstCardId","name":"My First Card","dueBy":"2020-02-12T16:24:00Z",` +
+		`"url":"https://trello.com/c/abcd1234/10-my-first-card"},` +
+		`{"type":"actions","id":"mySecondCardId","name":"My Second Card","dueBy":null,` +
+		`"url":"https://trello.com/c/bcde2345/11-my-second-card"},` +
+		`{"type":"actions","id":"todoCardId","name":"Todo Card","dueBy":null,` +
+		`"url":"https://trello.com/c/cdef3456/33-my-third-card"},` +
+		`{"type":"actions","id":"firstProjectCardId","name":"Project Card","dueBy":null,` +
+		`"url":"https://trello.com/c/fghi5678/55-my-project-card"}` +
 		`]}` + "\n"
 	if rr.Body.String() != expected {
 		t.Errorf("/actions returned incorrect body:\nexpected: %v\nactual:   %v", expected, rr.Body.String())

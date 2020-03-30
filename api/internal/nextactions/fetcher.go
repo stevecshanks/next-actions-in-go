@@ -142,6 +142,7 @@ func cardsToActions(cards []trello.Card) []Action {
 			ID:    card.ID,
 			Name:  card.Name,
 			DueBy: card.DueBy,
+			URL:   card.URL,
 		})
 	}
 	return actions

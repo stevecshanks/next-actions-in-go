@@ -2,6 +2,7 @@ package nextactions
 
 import (
 	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
@@ -25,7 +26,8 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 
 	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
 
-	ownedCards := []trello.Card{{ID: "an id", Name: "a name", Description: ""}}
+	cardURL, _ := url.Parse("https://example.com")
+	ownedCards := []trello.Card{{ID: "an id", Name: "a name", Description: "", URL: *cardURL}}
 	mockClient.EXPECT().OwnedCards().Return(ownedCards, nil).AnyTimes()
 	mockClient.EXPECT().CardsOnList(gomock.Any()).Return([]trello.Card{}, nil).AnyTimes()
 
@@ -33,7 +35,7 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{ID: "an id", Name: "a name"},
+		{ID: "an id", Name: "a name", URL: *cardURL},
 	}
 
 	if err != nil {

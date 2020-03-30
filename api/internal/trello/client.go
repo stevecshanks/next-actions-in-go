@@ -24,12 +24,55 @@ func ListsOnBoardPath(boardID string) string {
 	return fmt.Sprintf("/boards/%s/lists", boardID)
 }
 
+type URL struct {
+	url.URL
+}
+
+func (u *URL) UnmarshalJSON(data []byte) error {
+	var jsonURL string
+	if err := json.Unmarshal(data, &jsonURL); err != nil {
+		return err
+	}
+
+	parsedURL, err := url.Parse(jsonURL)
+	if err != nil {
+		return err
+	}
+
+	u.URL = *parsedURL
+
+	return nil
+}
+
 // Card represents a Trello card returned via the API
 type Card struct {
 	ID          string     `json:"id"`
 	Name        string     `json:"name"`
 	Description string     `json:"desc"`
 	DueBy       *time.Time `json:"due"`
+	URL         url.URL    `json:"-"`
+}
+
+type CardAlias Card
+
+func (c *Card) UnmarshalJSON(data []byte) error {
+	var jsonCard JSONCard
+	if err := json.Unmarshal(data, &jsonCard); err != nil {
+		return err
+	}
+	*c = jsonCard.Card()
+	return nil
+}
+
+type JSONCard struct {
+	CardAlias
+	URL URL `json:"url"`
+}
+
+func (jc *JSONCard) Card() Card {
+	card := Card(jc.CardAlias)
+	card.URL = jc.URL.URL
+	return card
 }
 
 // List represents a Trello list returned via the API
