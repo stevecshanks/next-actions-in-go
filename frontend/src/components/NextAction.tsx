@@ -18,7 +18,7 @@ const dateBadgeVariant = (action: Action): BadgeProps["variant"] => {
 };
 
 export const NextAction: React.FC<NextActionProps> = ({ action }) => (
-  <ListGroup.Item>
+  <ListGroup.Item action href={action.url} target="_blank">
     {action.name}
     {action.dueBy ? (
       <Badge pill variant={dateBadgeVariant(action)}>

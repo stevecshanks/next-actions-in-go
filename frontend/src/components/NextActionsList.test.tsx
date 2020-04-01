@@ -5,8 +5,8 @@ import { Action } from "../models/Action";
 
 test("renders the list of actions", () => {
   const actions: Action[] = [
-    new Action({ id: "1", name: "An action" }),
-    new Action({ id: "2", name: "Another action" }),
+    new Action({ id: "1", name: "An action", url: "" }),
+    new Action({ id: "2", name: "Another action", url: "" }),
   ];
 
   const { getByText } = render(<NextActionsList actions={actions} />);
@@ -19,15 +19,17 @@ test("renders the list of actions", () => {
 
 test("sorts actions by due date", () => {
   const actions: Action[] = [
-    new Action({ id: "1", name: "An action with no due date" }),
+    new Action({ id: "1", name: "An action with no due date", url: "" }),
     new Action({
       id: "2",
       name: "An action due later",
+      url: "",
       dueBy: new Date(2020, 9, 9),
     }),
     new Action({
       id: "3",
       name: "An action due soon",
+      url: "",
       dueBy: new Date(2020, 1, 1),
     }),
   ];

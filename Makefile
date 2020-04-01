@@ -35,4 +35,4 @@ go_lint:
 	cd api && golangci-lint run
 
 frontend_tests: install
-	cd frontend && CI=true npm test
+	cd frontend && npm run compile && CI=true npm test

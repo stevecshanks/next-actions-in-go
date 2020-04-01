@@ -65,7 +65,8 @@ func (f *Fetcher) fetchProjectTodoListCards() ([]trello.Card, error) {
 	todoListCardsChannel := make(chan []trello.Card)
 	errorsChannel := make(chan error)
 
-	for _, projectCard := range projectCards {
+	for i := range projectCards {
+		projectCard := &projectCards[i]
 		go f.fetchProjectTodoList(projectCard, todoListCardsChannel, errorsChannel)
 	}
 
@@ -84,7 +85,7 @@ func (f *Fetcher) fetchProjectTodoListCards() ([]trello.Card, error) {
 }
 
 func (f *Fetcher) fetchProjectTodoList(
-	projectCard trello.Card,
+	projectCard *trello.Card,
 	todoListCardsChannel chan []trello.Card,
 	errorsChannel chan error,
 ) {
@@ -113,7 +114,7 @@ func (f *Fetcher) fetchProjectTodoList(
 	todoListCardsChannel <- todoListCards
 }
 
-func getProjectBoardID(projectCard trello.Card) (string, error) {
+func getProjectBoardID(projectCard *trello.Card) (string, error) {
 	boardIDRegex, err := regexp.Compile(regexp.QuoteMeta(boardsURLPath) + `(\w+).*`)
 	if err != nil {
 		return "", err
@@ -137,11 +138,13 @@ func getTodoList(lists []trello.List) (*trello.List, error) {
 
 func cardsToActions(cards []trello.Card) []Action {
 	actions := make([]Action, 0)
-	for _, card := range cards {
+	for i := range cards {
+		card := &cards[i]
 		actions = append(actions, Action{
 			ID:    card.ID,
 			Name:  card.Name,
 			DueBy: card.DueBy,
+			URL:   card.URL,
 		})
 	}
 	return actions
