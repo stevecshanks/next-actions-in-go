@@ -32,7 +32,7 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 		DueBy:       &expectedDueBy,
 		URL:         *expectedURL1,
 	}
-	if !cardsAreEqual(cards[0], expectedCard1) {
+	if !cardsAreEqual(&cards[0], &expectedCard1) {
 		t.Errorf(fmt.Sprintf("OwnedCards returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))
 	}
 	expectedURL2, _ := url.Parse("https://trello.com/c/bcde2345/11-my-second-card")
@@ -42,7 +42,7 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 		Description: "",
 		URL:         *expectedURL2,
 	}
-	if !cardsAreEqual(cards[1], expectedCard2) {
+	if !cardsAreEqual(&cards[1], &expectedCard2) {
 		t.Errorf(fmt.Sprintf("OwnedCards returned incorrect card, expected %+v got %+v", expectedCard2, cards[1]))
 	}
 }
@@ -70,7 +70,7 @@ func TestClientCardsOnList(t *testing.T) {
 		Description: "a description",
 		URL:         *expectedURL,
 	}
-	if !cardsAreEqual(cards[0], expectedCard1) {
+	if !cardsAreEqual(&cards[0], &expectedCard1) {
 		t.Errorf(fmt.Sprintf("CardsOnList returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))
 	}
 }
@@ -101,7 +101,7 @@ func TestClientListsOnBoard(t *testing.T) {
 	}
 }
 
-func cardsAreEqual(card, other Card) bool {
+func cardsAreEqual(card, other *Card) bool {
 	return (card.ID == other.ID &&
 		card.Name == other.Name &&
 		card.Description == other.Description &&
