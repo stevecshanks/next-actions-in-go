@@ -13,7 +13,7 @@ beforeEach(() => MockDate.set(NOW));
 afterEach(() => MockDate.reset());
 
 test("displays action name", () => {
-  const anAction: Action = new Action({ id: "1", name: "An action" });
+  const anAction: Action = new Action({ id: "1", name: "An action", url: "" });
 
   const { getByText } = render(<NextAction action={anAction} />);
 
@@ -22,11 +22,26 @@ test("displays action name", () => {
   expect(foundAction).toBeInTheDocument();
 });
 
+test("links the action to the specified URL", () => {
+  const action: Action = new Action({
+    id: "1",
+    name: "An action",
+    url: "https://example.com/",
+  });
+
+  const { getByText } = render(<NextAction action={action} />);
+
+  const link = getByText("An action") as HTMLAnchorElement;
+
+  expect(link.href).toBe("https://example.com/");
+});
+
 test("displays action due date", () => {
   const later = new Date(NOW.getTime() + TWENTY_FOUR_HOURS);
   const anAction: Action = new Action({
     id: "1",
     name: "An action",
+    url: "",
     dueBy: later,
   });
 
@@ -44,6 +59,7 @@ test("highlights overdue due dates", () => {
   const overdueAction: Action = new Action({
     id: "1",
     name: "An overdue action",
+    url: "",
     dueBy: overdue,
   });
 
@@ -60,6 +76,7 @@ test("highlights due dates in the near future", () => {
   const overdueAction: Action = new Action({
     id: "1",
     name: "An action due soon",
+    url: "",
     dueBy: soon,
   });
 

@@ -1,4 +1,5 @@
 import React from "react";
+// @ts-ignore See: https://github.com/testing-library/react-testing-library/issues/610
 import { render, waitFor } from "@testing-library/react";
 import fetchMock from "jest-fetch-mock";
 import MockDate from "mockdate";

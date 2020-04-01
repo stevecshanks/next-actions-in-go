@@ -13,6 +13,7 @@ test("actions with no due date are not overdue", () => {
   const action = new Action({
     id: "1",
     name: "Action",
+    url: "",
   });
 
   expect(action.isOverdue()).toBeFalsy();
@@ -22,6 +23,7 @@ test("actions due in the past are overdue", () => {
   const action = new Action({
     id: "1",
     name: "Action",
+    url: "",
     dueBy: new Date(NOW.getTime() - ONE_SECOND),
   });
 
@@ -32,6 +34,7 @@ test("actions due now are not overdue", () => {
   const action = new Action({
     id: "1",
     name: "Action",
+    url: "",
     dueBy: NOW,
   });
 
@@ -42,6 +45,7 @@ test("actions with no due date are not due soon", () => {
   const action = new Action({
     id: "1",
     name: "Action",
+    url: "",
   });
 
   expect(action.isDueSoon()).toBeFalsy();
@@ -51,6 +55,7 @@ test("actions due in less than a day are due soon", () => {
   const action = new Action({
     id: "1",
     name: "Action",
+    url: "",
     dueBy: new Date(NOW.getTime() + TWENTY_FOUR_HOURS - ONE_SECOND),
   });
 
@@ -61,6 +66,7 @@ test("actions due in a day are not due soon", () => {
   const action = new Action({
     id: "1",
     name: "Action",
+    url: "",
     dueBy: new Date(NOW.getTime() + TWENTY_FOUR_HOURS),
   });
 

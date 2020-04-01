@@ -8,6 +8,7 @@ import "./App.css";
 type JsonAction = {
   id: string;
   name: string;
+  url: string;
   dueBy?: string;
 };
 
