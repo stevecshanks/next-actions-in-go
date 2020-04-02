@@ -5,3 +5,19 @@ body {
 .badge {
   float: right;
 }
+
+.list-group-item {
+  color: #212529;
+  background-color: white;
+}
+
+.list-group-item.active {
+  border-color: rgba(0, 0, 0, 0.125);
+  color: #212529;
+  background-color: white;
+}
+
+.list-group-item:hover {
+  color: #495057;
+  background-color: #f8f9fa;
+}
