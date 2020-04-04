@@ -5,6 +5,8 @@ import { Action } from "../models/Action";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
+const ONE_HOUR = 60 * 60 * 1000;
+
 type JsonAction = {
   id: string;
   name: string;
@@ -32,13 +34,20 @@ const App: React.FC = () => {
       .catch(() => setErrorMessage("An error occurred"));
   };
 
-  useEffect(fetchActions, []);
+  const updateNotificationCount = () => {
+    const notificationCount = actions.filter(
+      action => action.isOverdue() || action.isDueSoon(),
+    ).length;
+    const notificationText = notificationCount ? `(${notificationCount}) ` : "";
+    document.title = `${notificationText}Next Actions`;
+  };
 
-  const notificationCount = actions.filter(
-    action => action.isOverdue() || action.isDueSoon(),
-  ).length;
-  const notificationText = notificationCount ? `(${notificationCount}) ` : "";
-  document.title = `${notificationText}Next Actions`;
+  useEffect(() => {
+    fetchActions();
+    setInterval(fetchActions, ONE_HOUR);
+  }, []);
+
+  useEffect(updateNotificationCount, [actions]);
 
   return (
     <>
