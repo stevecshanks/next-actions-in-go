@@ -39,7 +39,7 @@ test("sorts actions by due date", () => {
   const foundActions = getAllByText("An action", { exact: false });
 
   expect(foundActions).toHaveLength(3);
-  expect(foundActions[0].textContent).toMatch(/^An action due soon.*/);
-  expect(foundActions[1].textContent).toMatch(/^An action due later.*/);
-  expect(foundActions[2].textContent).toMatch(/^An action with no due date.*/);
+  expect(foundActions[0].textContent).toMatch(/An action due soon/);
+  expect(foundActions[1].textContent).toMatch(/An action due later/);
+  expect(foundActions[2].textContent).toMatch(/An action with no due date/);
 });

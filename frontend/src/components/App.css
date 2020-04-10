@@ -1,23 +1,50 @@
 body {
-  margin: 1rem 5rem 1rem 5rem;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 70rem;
+}
+
+#root {
+  padding: 0.3rem;
 }
 
 .badge {
   float: right;
+  margin: 0.3rem;
+}
+
+.list-group {
+  padding: 0.3rem;
 }
 
 .list-group-item {
   color: #212529;
-  background-color: white;
+  background-color: rgba(0, 0, 0, 0.025);
+  padding: 0;
+  margin: 0.3rem 0;
+  border: none;
+  border-radius: 0.25rem;
 }
 
 .list-group-item.active {
-  border-color: rgba(0, 0, 0, 0.125);
   color: #212529;
-  background-color: white;
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.list-group-item.list-group-item.active {
+  margin-top: 0.3rem;
 }
 
 .list-group-item:hover {
   color: #212529;
-  background-color: #f8f9fa;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.action-image {
+  float: left;
+  background-size: cover;
+  height: 3rem;
+  width: 3rem;
+  border-radius: 0.25rem 0 0 0.25rem;
+  margin-right: 0.4rem;
 }
