@@ -35,6 +35,22 @@ func TestActions(t *testing.T) {
 		trello.CardsOnListPath("todoListId"),
 		trelloResponse("project_todo_list_cards_response.json"),
 	)
+	mockServer.AddFileResponse(
+		trello.BoardPath("myFirstBoardId"),
+		trelloResponse("board_response.json"),
+	)
+	mockServer.AddFileResponse(
+		trello.BoardPath("mySecondBoardId"),
+		trelloResponse("board_response.json"),
+	)
+	mockServer.AddFileResponse(
+		trello.BoardPath("nextActionsBoardId"),
+		trelloResponse("board_response.json"),
+	)
+	mockServer.AddFileResponse(
+		trello.BoardPath("myProjectBoardId"),
+		trelloResponse("board_response.json"),
+	)
 
 	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123", "projectsList456")
 	defer config.TeardownEnvironment()
@@ -54,13 +70,17 @@ func TestActions(t *testing.T) {
 
 	expected := `{"data":[` +
 		`{"type":"actions","id":"myFirstCardId","name":"My First Card","dueBy":"2020-02-12T16:24:00Z",` +
-		`"url":"https://trello.com/c/abcd1234/10-my-first-card"},` +
+		`"url":"https://trello.com/c/abcd1234/10-my-first-card",` +
+		`"imageUrl":"https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"},` +
 		`{"type":"actions","id":"mySecondCardId","name":"My Second Card","dueBy":null,` +
-		`"url":"https://trello.com/c/bcde2345/11-my-second-card"},` +
+		`"url":"https://trello.com/c/bcde2345/11-my-second-card",` +
+		`"imageUrl":"https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"},` +
 		`{"type":"actions","id":"todoCardId","name":"Todo Card","dueBy":null,` +
-		`"url":"https://trello.com/c/cdef3456/33-my-third-card"},` +
+		`"url":"https://trello.com/c/cdef3456/33-my-third-card",` +
+		`"imageUrl":"https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"},` +
 		`{"type":"actions","id":"firstProjectCardId","name":"Project Card","dueBy":null,` +
-		`"url":"https://trello.com/c/fghi5678/55-my-project-card"}` +
+		`"url":"https://trello.com/c/fghi5678/55-my-project-card",` +
+		`"imageUrl":"https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"}` +
 		`]}` + "\n"
 	if rr.Body.String() != expected {
 		t.Errorf("/actions returned incorrect body:\nexpected: %v\nactual:   %v", expected, rr.Body.String())

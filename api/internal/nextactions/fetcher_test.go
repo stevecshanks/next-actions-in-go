@@ -20,6 +20,23 @@ func testConfig() *config.Config {
 	}
 }
 
+func testImageURL(size string) url.URL {
+	imageURL, _ := url.Parse(fmt.Sprintf("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/%s.jpg", size))
+	return *imageURL
+}
+
+func testBoard() *trello.Board {
+	return &trello.Board{
+		ID: "boardId",
+		Preferences: trello.Preferences{
+			BackgroundImages: []trello.BackgroundImage{
+				{URL: testImageURL("75x100")},
+				{URL: testImageURL("144x192")},
+			},
+		},
+	}
+}
+
 func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -27,15 +44,16 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
 
 	cardURL, _ := url.Parse("https://example.com")
-	ownedCards := []trello.Card{{ID: "an id", Name: "a name", Description: "", URL: *cardURL}}
+	ownedCards := []trello.Card{{ID: "an id", Name: "a name", URL: *cardURL, BoardID: "boardId"}}
 	mockClient.EXPECT().OwnedCards().Return(ownedCards, nil).AnyTimes()
 	mockClient.EXPECT().CardsOnList(gomock.Any()).Return([]trello.Card{}, nil).AnyTimes()
+	mockClient.EXPECT().GetBoard("boardId").Return(testBoard(), nil).AnyTimes()
 
 	fetcher := Fetcher{mockClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{ID: "an id", Name: "a name", URL: *cardURL},
+		{ID: "an id", Name: "a name", URL: *cardURL, ImageURL: testImageURL("75x100")},
 	}
 
 	if err != nil {
@@ -75,16 +93,17 @@ func TestCardsInNextActionsListAreReturnedAsActions(t *testing.T) {
 
 	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
 
-	nextActionsCards := []trello.Card{{ID: "an id", Name: "a name", Description: ""}}
+	nextActionsCards := []trello.Card{{ID: "an id", Name: "a name", BoardID: "boardId"}}
 	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
 	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return(nextActionsCards, nil).AnyTimes()
 	mockClient.EXPECT().CardsOnList(gomock.Eq("projectsListId")).Return([]trello.Card{}, nil).AnyTimes()
+	mockClient.EXPECT().GetBoard("boardId").Return(testBoard(), nil).AnyTimes()
 
 	fetcher := Fetcher{mockClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{ID: "an id", Name: "a name"},
+		{ID: "an id", Name: "a name", ImageURL: testImageURL("75x100")},
 	}
 
 	if err != nil {
@@ -271,20 +290,21 @@ func TestFirstTodoListItemsAreReturnedAsActions(t *testing.T) {
 	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/aBoardId"}
 	todoList := trello.List{ID: "todoListId", Name: "Todo"}
 	todoListCards := []trello.Card{
-		{ID: "an id", Name: "a name", Description: ""},
-		{ID: "another id", Name: "another name", Description: ""},
+		{ID: "an id", Name: "a name", BoardID: "boardId"},
+		{ID: "another id", Name: "another name", BoardID: "boardId"},
 	}
 	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
 	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return([]trello.Card{}, nil).AnyTimes()
 	mockClient.EXPECT().CardsOnList(gomock.Eq("projectsListId")).Return([]trello.Card{projectCard}, nil).AnyTimes()
 	mockClient.EXPECT().ListsOnBoard(gomock.Eq("aBoardId")).Return([]trello.List{todoList}, nil).AnyTimes()
 	mockClient.EXPECT().CardsOnList(gomock.Eq("todoListId")).Return(todoListCards, nil).AnyTimes()
+	mockClient.EXPECT().GetBoard("boardId").Return(testBoard(), nil).AnyTimes()
 
 	fetcher := Fetcher{mockClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{ID: "an id", Name: "a name"},
+		{ID: "an id", Name: "a name", ImageURL: testImageURL("75x100")},
 	}
 
 	if err != nil {
@@ -305,15 +325,16 @@ func TestCardDueByDateIsAddedToActions(t *testing.T) {
 	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
 
 	dueBy, _ := time.Parse(time.RFC3339, "2020-02-12T16:24:00.000Z")
-	ownedCards := []trello.Card{{ID: "an id", Name: "a name", Description: "", DueBy: &dueBy}}
+	ownedCards := []trello.Card{{ID: "an id", Name: "a name", DueBy: &dueBy, BoardID: "boardId"}}
 	mockClient.EXPECT().OwnedCards().Return(ownedCards, nil).AnyTimes()
 	mockClient.EXPECT().CardsOnList(gomock.Any()).Return([]trello.Card{}, nil).AnyTimes()
+	mockClient.EXPECT().GetBoard("boardId").Return(testBoard(), nil).AnyTimes()
 
 	fetcher := Fetcher{mockClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{ID: "an id", Name: "a name", DueBy: &dueBy},
+		{ID: "an id", Name: "a name", DueBy: &dueBy, ImageURL: testImageURL("75x100")},
 	}
 
 	if err != nil {

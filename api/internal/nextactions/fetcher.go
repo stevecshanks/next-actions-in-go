@@ -15,6 +15,7 @@ type TrelloClient interface {
 	OwnedCards() ([]trello.Card, error)
 	CardsOnList(listID string) ([]trello.Card, error)
 	ListsOnBoard(boardID string) ([]trello.List, error)
+	GetBoard(boardID string) (*trello.Board, error)
 }
 
 type Fetcher struct {
@@ -43,7 +44,7 @@ func (f *Fetcher) Fetch() ([]Action, error) {
 	}
 	allCards = append(allCards, projectTodoCards...)
 
-	return cardsToActions(allCards), nil
+	return f.cardsToActions(allCards)
 }
 
 func (f *Fetcher) fetchOwnedCards() ([]trello.Card, error) {
@@ -114,6 +115,25 @@ func (f *Fetcher) fetchProjectTodoList(
 	todoListCardsChannel <- todoListCards
 }
 
+func (f *Fetcher) cardsToActions(cards []trello.Card) ([]Action, error) {
+	actions := make([]Action, 0)
+	for i := range cards {
+		card := &cards[i]
+		board, err := f.Client.GetBoard(card.BoardID)
+		if err != nil {
+			return nil, err
+		}
+		actions = append(actions, Action{
+			ID:       card.ID,
+			Name:     card.Name,
+			DueBy:    card.DueBy,
+			URL:      card.URL,
+			ImageURL: board.Preferences.BackgroundImages[0].URL,
+		})
+	}
+	return actions, nil
+}
+
 func getProjectBoardID(projectCard *trello.Card) (string, error) {
 	boardIDRegex, err := regexp.Compile(regexp.QuoteMeta(boardsURLPath) + `(\w+).*`)
 	if err != nil {
@@ -134,18 +154,4 @@ func getTodoList(lists []trello.List) (*trello.List, error) {
 		}
 	}
 	return nil, fmt.Errorf("missing Todo list on board")
-}
-
-func cardsToActions(cards []trello.Card) []Action {
-	actions := make([]Action, 0)
-	for i := range cards {
-		card := &cards[i]
-		actions = append(actions, Action{
-			ID:    card.ID,
-			Name:  card.Name,
-			DueBy: card.DueBy,
-			URL:   card.URL,
-		})
-	}
-	return actions
 }
