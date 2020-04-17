@@ -11,12 +11,13 @@ type JsonAction = {
   id: string;
   name: string;
   url: string;
+  imageUrl: string;
   dueBy?: string;
 };
 
 const actionsFromJson = (json: JsonAction[]): Action[] =>
   json.map(
-    action =>
+    (action) =>
       new Action({
         ...action,
         dueBy: action.dueBy ? new Date(action.dueBy) : undefined,
@@ -29,14 +30,14 @@ const App: React.FC = () => {
 
   const fetchActions = () => {
     fetch("api/actions")
-      .then(response => response.json())
-      .then(json => setActions(actionsFromJson(json.data)))
+      .then((response) => response.json())
+      .then((json) => setActions(actionsFromJson(json.data)))
       .catch(() => setErrorMessage("An error occurred"));
   };
 
   const updateNotificationCount = () => {
     const notificationCount = actions.filter(
-      action => action.isOverdue() || action.isDueSoon(),
+      (action) => action.isOverdue() || action.isDueSoon(),
     ).length;
     const notificationText = notificationCount ? `(${notificationCount}) ` : "";
     document.title = `${notificationText}Next Actions`;
