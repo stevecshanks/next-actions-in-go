@@ -56,6 +56,7 @@ type Card struct {
 	Description string     `json:"desc"`
 	DueBy       *time.Time `json:"due"`
 	URL         url.URL    `json:"-"`
+	BoardID     string     `json:"idBoard"`
 }
 
 type CardAlias Card
