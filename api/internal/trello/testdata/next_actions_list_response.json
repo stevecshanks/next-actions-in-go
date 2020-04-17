@@ -7,7 +7,7 @@
     "desc": "a description",
     "descData": null,
     "dueReminder": null,
-    "idBoard": "nextActionsBoardId",
+    "idBoard": "myBoardId",
     "idList": "123456789012345678901234",
     "idMembersVoted": [],
     "idShort": 30,

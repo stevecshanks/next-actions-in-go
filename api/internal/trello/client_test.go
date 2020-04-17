@@ -31,7 +31,7 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 		Description: "",
 		DueBy:       &expectedDueBy,
 		URL:         *expectedURL1,
-		BoardID:     "myFirstBoardId",
+		BoardID:     "myBoardId",
 	}
 	if !cardsAreEqual(&cards[0], &expectedCard1) {
 		t.Errorf(fmt.Sprintf("OwnedCards returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))
@@ -42,7 +42,7 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 		Name:        "My Second Card",
 		Description: "",
 		URL:         *expectedURL2,
-		BoardID:     "mySecondBoardId",
+		BoardID:     "myBoardId",
 	}
 	if !cardsAreEqual(&cards[1], &expectedCard2) {
 		t.Errorf(fmt.Sprintf("OwnedCards returned incorrect card, expected %+v got %+v", expectedCard2, cards[1]))
@@ -71,7 +71,7 @@ func TestClientCardsOnList(t *testing.T) {
 		Name:        "Todo Card",
 		Description: "a description",
 		URL:         *expectedURL,
-		BoardID:     "nextActionsBoardId",
+		BoardID:     "myBoardId",
 	}
 	if !cardsAreEqual(&cards[0], &expectedCard1) {
 		t.Errorf(fmt.Sprintf("CardsOnList returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))

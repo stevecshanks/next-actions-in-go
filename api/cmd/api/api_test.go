@@ -36,19 +36,7 @@ func TestActions(t *testing.T) {
 		trelloResponse("project_todo_list_cards_response.json"),
 	)
 	mockServer.AddFileResponse(
-		trello.BoardPath("myFirstBoardId"),
-		trelloResponse("board_response.json"),
-	)
-	mockServer.AddFileResponse(
-		trello.BoardPath("mySecondBoardId"),
-		trelloResponse("board_response.json"),
-	)
-	mockServer.AddFileResponse(
-		trello.BoardPath("nextActionsBoardId"),
-		trelloResponse("board_response.json"),
-	)
-	mockServer.AddFileResponse(
-		trello.BoardPath("myProjectBoardId"),
+		trello.BoardPath("myBoardId"),
 		trelloResponse("board_response.json"),
 	)
 
