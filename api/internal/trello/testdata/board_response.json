@@ -1,0 +1,59 @@
+{
+  "id": "myBoardId",
+  "name": "My Board",
+  "desc": "",
+  "descData": null,
+  "closed": false,
+  "idOrganization": "123",
+  "idEnterprise": null,
+  "pinned": false,
+  "url": "https://trello.com/b/myBoardId/my-board",
+  "shortUrl": "https://trello.com/b/myBoardId",
+  "labelNames": {
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "red": "",
+    "purple": "",
+    "blue": "",
+    "sky": "",
+    "lime": "",
+    "pink": "",
+    "black": ""
+  },
+  "prefs": {
+    "permissionLevel": "org",
+    "hideVotes": false,
+    "voting": "disabled",
+    "comments": "members",
+    "invitations": "members",
+    "selfJoin": true,
+    "cardCovers": true,
+    "isTemplate": false,
+    "cardAging": "regular",
+    "calendarFeedEnabled": false,
+    "background": "backgroundId123",
+    "backgroundImage": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/photo-123",
+    "backgroundImageScaled": [
+      {
+        "width": 75,
+        "height": 100,
+        "url": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"
+      },
+      {
+        "width": 144,
+        "height": 192,
+        "url": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/144x192.jpg"
+      }
+    ],
+    "backgroundTile": false,
+    "backgroundBrightness": "dark",
+    "backgroundBottomColor": "#172023",
+    "backgroundTopColor": "#46727e",
+    "canBePublic": true,
+    "canBeEnterprise": true,
+    "canBeOrg": true,
+    "canBePrivate": true,
+    "canInvite": true
+  }
+}

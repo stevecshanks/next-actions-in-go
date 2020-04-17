@@ -2,6 +2,7 @@ interface ActionArgs {
   id: string;
   name: string;
   url: string;
+  imageUrl: string;
   dueBy?: Date;
 }
 
@@ -11,14 +12,16 @@ export class Action {
   id: string;
   name: string;
   url: string;
+  imageUrl: string;
   dueBy?: Date;
 
   constructor(args: ActionArgs) {
-    const { id, name, url, dueBy } = args;
+    const { id, name, url, imageUrl, dueBy } = args;
 
     this.id = id;
     this.name = name;
     this.url = url;
+    this.imageUrl = imageUrl;
     this.dueBy = dueBy;
   }
 

@@ -15,6 +15,7 @@ type TrelloClient interface {
 	OwnedCards() ([]trello.Card, error)
 	CardsOnList(listID string) ([]trello.Card, error)
 	ListsOnBoard(boardID string) ([]trello.List, error)
+	GetBoard(boardID string) (*trello.Board, error)
 }
 
 type Fetcher struct {
@@ -43,7 +44,12 @@ func (f *Fetcher) Fetch() ([]Action, error) {
 	}
 	allCards = append(allCards, projectTodoCards...)
 
-	return cardsToActions(allCards), nil
+	boardsByID, err := f.fetchAllBoards(allCards)
+	if err != nil {
+		return nil, err
+	}
+
+	return cardsToActions(allCards, boardsByID), nil
 }
 
 func (f *Fetcher) fetchOwnedCards() ([]trello.Card, error) {
@@ -114,6 +120,43 @@ func (f *Fetcher) fetchProjectTodoList(
 	todoListCardsChannel <- todoListCards
 }
 
+func (f *Fetcher) fetchAllBoards(cards []trello.Card) (map[string]*trello.Board, error) {
+	boardsChannel := make(chan *trello.Board)
+	errorsChannel := make(chan error)
+
+	uniqueBoardIDs := make(map[string]interface{})
+	for i := range cards {
+		uniqueBoardIDs[cards[i].BoardID] = nil
+	}
+
+	for boardID := range uniqueBoardIDs {
+		go f.fetchBoard(boardID, boardsChannel, errorsChannel)
+	}
+
+	boardsByID := make(map[string]*trello.Board)
+
+	for range uniqueBoardIDs {
+		select {
+		case board := <-boardsChannel:
+			boardsByID[board.ID] = board
+		case err := <-errorsChannel:
+			return nil, err
+		}
+	}
+
+	return boardsByID, nil
+}
+
+func (f *Fetcher) fetchBoard(boardID string, boardsChannel chan *trello.Board, errorsChannel chan error) {
+	board, err := f.Client.GetBoard(boardID)
+	if err != nil {
+		errorsChannel <- err
+		return
+	}
+
+	boardsChannel <- board
+}
+
 func getProjectBoardID(projectCard *trello.Card) (string, error) {
 	boardIDRegex, err := regexp.Compile(regexp.QuoteMeta(boardsURLPath) + `(\w+).*`)
 	if err != nil {
@@ -136,15 +179,16 @@ func getTodoList(lists []trello.List) (*trello.List, error) {
 	return nil, fmt.Errorf("missing Todo list on board")
 }
 
-func cardsToActions(cards []trello.Card) []Action {
+func cardsToActions(cards []trello.Card, boardsByID map[string]*trello.Board) []Action {
 	actions := make([]Action, 0)
 	for i := range cards {
 		card := &cards[i]
 		actions = append(actions, Action{
-			ID:    card.ID,
-			Name:  card.Name,
-			DueBy: card.DueBy,
-			URL:   card.URL,
+			ID:       card.ID,
+			Name:     card.Name,
+			DueBy:    card.DueBy,
+			URL:      card.URL,
+			ImageURL: boardsByID[card.BoardID].Preferences.BackgroundImages[0].URL,
 		})
 	}
 	return actions

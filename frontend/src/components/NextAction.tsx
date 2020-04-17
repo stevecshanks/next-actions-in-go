@@ -24,7 +24,7 @@ export const NextAction: React.FC<NextActionProps> = ({ action }) => (
         {action.dueBy.toLocaleDateString()}
       </Badge>
     ) : null}
-    <ActionImage url="https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100/82e01e3a2ef841bebd6cdb064d2e95d3/photo-1527667250583-fcdbb18a523d.jpg" />
+    <ActionImage url={action.imageUrl} />
     {action.name}
   </ListGroup.Item>
 );

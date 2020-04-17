@@ -24,6 +24,11 @@ func ListsOnBoardPath(boardID string) string {
 	return fmt.Sprintf("/boards/%s/lists", boardID)
 }
 
+// BoardPath returns the path on the Trello API server where a board can be queried
+func BoardPath(boardID string) string {
+	return fmt.Sprintf("/boards/%s", boardID)
+}
+
 type URL struct {
 	url.URL
 }
@@ -51,6 +56,7 @@ type Card struct {
 	Description string     `json:"desc"`
 	DueBy       *time.Time `json:"due"`
 	URL         url.URL    `json:"-"`
+	BoardID     string     `json:"idBoard"`
 }
 
 type CardAlias Card
@@ -81,6 +87,35 @@ type List struct {
 	Name string `json:"name"`
 }
 
+// Board represents a Trello board returned via the API
+type Board struct {
+	ID          string      `json:"id"`
+	Preferences Preferences `json:"prefs"`
+}
+
+// Preferences represents the preferences for a Trello board returned via the API
+type Preferences struct {
+	BackgroundImages []BackgroundImage `json:"backgroundImageScaled"`
+}
+
+// BackgroundImage represents the background image of a Trello board returned via the API
+type BackgroundImage struct {
+	URL url.URL `json:"-"`
+}
+
+func (b *BackgroundImage) UnmarshalJSON(data []byte) error {
+	var jsonBackgroundImage JSONBackgroundImage
+	if err := json.Unmarshal(data, &jsonBackgroundImage); err != nil {
+		return err
+	}
+	*b = BackgroundImage{jsonBackgroundImage.URL.URL}
+	return nil
+}
+
+type JSONBackgroundImage struct {
+	URL URL `json:"url"`
+}
+
 // Client is used to interact with the Trello API
 type Client struct {
 	BaseURL *url.URL
@@ -101,6 +136,11 @@ func (c *Client) CardsOnList(listID string) ([]Card, error) {
 // ListsOnBoard will return the lists on the specified board
 func (c *Client) ListsOnBoard(boardID string) ([]List, error) {
 	return c.getLists(ListsOnBoardPath(boardID))
+}
+
+// GetBoard will return the board with the specified ID
+func (c *Client) GetBoard(boardID string) (*Board, error) {
+	return c.getBoard(BoardPath(boardID))
 }
 
 func (c *Client) getCards(relativePath string) ([]Card, error) {
@@ -131,6 +171,21 @@ func (c *Client) getLists(relativePath string) ([]List, error) {
 	}
 
 	return lists, nil
+}
+
+func (c *Client) getBoard(relativePath string) (*Board, error) {
+	resp, err := c.get(relativePath)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	board := Board{}
+	if err := json.NewDecoder(resp.Body).Decode(&board); err != nil {
+		return nil, err
+	}
+
+	return &board, nil
 }
 
 func (c *Client) get(relativePath string) (*http.Response, error) {

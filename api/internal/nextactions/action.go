@@ -16,10 +16,11 @@ func (u *URL) MarshalJSON() ([]byte, error) {
 
 // Action represents a "next action" in GTD
 type Action struct {
-	ID    string     `json:"id"`
-	Name  string     `json:"name"`
-	DueBy *time.Time `json:"dueBy"`
-	URL   url.URL    `json:"-"`
+	ID       string     `json:"id"`
+	Name     string     `json:"name"`
+	DueBy    *time.Time `json:"dueBy"`
+	URL      url.URL    `json:"-"`
+	ImageURL url.URL    `json:"-"`
 }
 
 type ActionAlias Action
@@ -29,11 +30,13 @@ func (a *Action) MarshalJSON() ([]byte, error) {
 		ActionAlias: ActionAlias(*a),
 		Type:        "actions",
 		URL:         a.URL.String(),
+		ImageURL:    a.ImageURL.String(),
 	})
 }
 
 type JSONAction struct {
 	Type string `json:"type"` // Required by JSON-API
 	ActionAlias
-	URL string `json:"url"`
+	URL      string `json:"url"`
+	ImageURL string `json:"imageUrl"`
 }

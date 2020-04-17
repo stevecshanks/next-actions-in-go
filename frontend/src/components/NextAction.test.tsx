@@ -13,7 +13,12 @@ beforeEach(() => MockDate.set(NOW));
 afterEach(() => MockDate.reset());
 
 test("displays action name", () => {
-  const anAction: Action = new Action({ id: "1", name: "An action", url: "" });
+  const anAction = new Action({
+    id: "1",
+    name: "An action",
+    url: "",
+    imageUrl: "",
+  });
 
   const { getByText } = render(<NextAction action={anAction} />);
 
@@ -23,10 +28,11 @@ test("displays action name", () => {
 });
 
 test("links the action to the specified URL", () => {
-  const action: Action = new Action({
+  const action = new Action({
     id: "1",
     name: "An action",
     url: "https://example.com/",
+    imageUrl: "",
   });
 
   const { getByText } = render(<NextAction action={action} />);
@@ -38,10 +44,11 @@ test("links the action to the specified URL", () => {
 
 test("displays action due date", () => {
   const later = new Date(NOW.getTime() + TWENTY_FOUR_HOURS);
-  const anAction: Action = new Action({
+  const anAction = new Action({
     id: "1",
     name: "An action",
     url: "",
+    imageUrl: "",
     dueBy: later,
   });
 
@@ -56,10 +63,11 @@ test("displays action due date", () => {
 test("highlights overdue due dates", () => {
   const overdue = new Date(NOW.getTime() - ONE_SECOND);
 
-  const overdueAction: Action = new Action({
+  const overdueAction = new Action({
     id: "1",
     name: "An overdue action",
     url: "",
+    imageUrl: "",
     dueBy: overdue,
   });
 
@@ -73,10 +81,11 @@ test("highlights overdue due dates", () => {
 test("highlights due dates in the near future", () => {
   const soon = new Date(NOW.getTime() + TWENTY_FOUR_HOURS - ONE_SECOND);
 
-  const overdueAction: Action = new Action({
+  const overdueAction = new Action({
     id: "1",
     name: "An action due soon",
     url: "",
+    imageUrl: "",
     dueBy: soon,
   });
 
@@ -85,4 +94,19 @@ test("highlights due dates in the near future", () => {
   const foundDate = getByText("1/16/2020");
 
   expect(foundDate.classList).toContain("badge-warning");
+});
+
+test("displays the relevant image for the action", () => {
+  const actionWithImage = new Action({
+    id: "1",
+    name: "An action with image",
+    url: "",
+    imageUrl: "example.jpg",
+  });
+
+  const { getByText } = render(<NextAction action={actionWithImage} />);
+
+  const foundAction = getByText("An action with image");
+
+  expect(foundAction.innerHTML).toContain("example.jpg");
 });
