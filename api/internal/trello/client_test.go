@@ -101,6 +101,40 @@ func TestClientListsOnBoard(t *testing.T) {
 	}
 }
 
+func TestClientGetBoard(t *testing.T) {
+	mockServer := CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	defer TeardownMockServer()
+
+	mockServer.AddFileResponse(BoardPath("myBoardId"), "./testdata/board_response.json")
+
+	baseURL, _ := url.Parse("https://api.trello.com/1")
+	client := Client{baseURL, "some key", "some token"}
+
+	board, err := client.GetBoard("myBoardId")
+	if err != nil {
+		t.Errorf("GetBoard returned error: %s", err)
+	}
+
+	backgroundURL1, _ := url.Parse("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg")
+	backgroundURL2, _ := url.Parse("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/144x192.jpg")
+	backgroundImages := []BackgroundImage{
+		{*backgroundURL1},
+		{*backgroundURL2},
+	}
+	expectedBoard := Board{"myBoardId", Preferences{backgroundImages}}
+	if expectedBoard.ID != board.ID {
+		t.Errorf(fmt.Sprintf("GetBoard returned incorrect board, expected %+v got %+v", expectedBoard, board))
+	}
+	if len(expectedBoard.Preferences.BackgroundImages) != len(board.Preferences.BackgroundImages) {
+		t.Fatalf(fmt.Sprintf("GetBoard returned incorrect board, expected %+v got %+v", expectedBoard, board))
+	}
+	for i, expectedBackgroundImage := range expectedBoard.Preferences.BackgroundImages {
+		if expectedBackgroundImage.URL.String() != board.Preferences.BackgroundImages[i].URL.String() {
+			t.Errorf(fmt.Sprintf("GetBoard returned incorrect board, expected %+v got %+v", expectedBoard, board))
+		}
+	}
+}
+
 func cardsAreEqual(card, other *Card) bool {
 	return (card.ID == other.ID &&
 		card.Name == other.Name &&
