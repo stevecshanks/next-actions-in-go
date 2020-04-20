@@ -1,7 +1,6 @@
 import React from "react";
 import MockDate from "mockdate";
 import { render } from "@testing-library/react";
-import { Action } from "../models/Action";
 import { NextAction } from "./NextAction";
 import { buildAction } from "../models/Action.test";
 
@@ -94,4 +93,16 @@ test("displays the relevant image for the action", () => {
   const foundAction = getByText("An action with image");
 
   expect(foundAction.innerHTML).toContain("example.jpg");
+});
+
+test("displays project name", () => {
+  const anAction = buildAction({
+    projectName: "A project with name",
+  });
+
+  const { getByText } = render(<NextAction action={anAction} />);
+
+  const foundAction = getByText("A project with name");
+
+  expect(foundAction).toBeInTheDocument();
 });

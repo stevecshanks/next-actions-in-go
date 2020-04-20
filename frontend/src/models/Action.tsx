@@ -3,6 +3,7 @@ export interface ActionArgs {
   name: string;
   url: string;
   imageUrl: string;
+  projectName: string;
   dueBy?: Date;
 }
 
@@ -13,15 +14,17 @@ export class Action {
   name: string;
   url: string;
   imageUrl: string;
+  projectName: string;
   dueBy?: Date;
 
   constructor(args: ActionArgs) {
-    const { id, name, url, imageUrl, dueBy } = args;
+    const { id, name, url, imageUrl, projectName, dueBy } = args;
 
     this.id = id;
     this.name = name;
     this.url = url;
     this.imageUrl = imageUrl;
+    this.projectName = projectName;
     this.dueBy = dueBy;
   }
 

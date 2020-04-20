@@ -12,6 +12,7 @@ type JsonAction = {
   name: string;
   url: string;
   imageUrl: string;
+  projectName: string;
   dueBy?: string;
 };
 
