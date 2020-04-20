@@ -27,7 +27,8 @@ func testImageURL(size string) url.URL {
 
 func testBoard() *trello.Board {
 	return &trello.Board{
-		ID: "boardId",
+		ID:   "boardId",
+		Name: "My Project",
 		Preferences: trello.Preferences{
 			BackgroundImages: []trello.BackgroundImage{
 				{URL: testImageURL("75x100")},
@@ -53,7 +54,7 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{ID: "an id", Name: "a name", URL: *cardURL, ImageURL: testImageURL("75x100")},
+		{ID: "an id", Name: "a name", URL: *cardURL, ImageURL: testImageURL("75x100"), ProjectName: "My Project"},
 	}
 
 	if err != nil {
@@ -103,7 +104,7 @@ func TestCardsInNextActionsListAreReturnedAsActions(t *testing.T) {
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{ID: "an id", Name: "a name", ImageURL: testImageURL("75x100")},
+		{ID: "an id", Name: "a name", ImageURL: testImageURL("75x100"), ProjectName: "My Project"},
 	}
 
 	if err != nil {
@@ -304,7 +305,7 @@ func TestFirstTodoListItemsAreReturnedAsActions(t *testing.T) {
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{ID: "an id", Name: "a name", ImageURL: testImageURL("75x100")},
+		{ID: "an id", Name: "a name", ImageURL: testImageURL("75x100"), ProjectName: "My Project"},
 	}
 
 	if err != nil {
@@ -334,7 +335,7 @@ func TestCardDueByDateIsAddedToActions(t *testing.T) {
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
-		{ID: "an id", Name: "a name", DueBy: &dueBy, ImageURL: testImageURL("75x100")},
+		{ID: "an id", Name: "a name", DueBy: &dueBy, ImageURL: testImageURL("75x100"), ProjectName: "My Project"},
 	}
 
 	if err != nil {
