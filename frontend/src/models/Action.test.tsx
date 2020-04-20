@@ -1,5 +1,18 @@
 import MockDate from "mockdate";
-import { Action } from "../models/Action";
+import { Action, ActionArgs } from "../models/Action";
+
+const ACTION_DEFAULTS = {
+  id: "anId123",
+  name: "An Action",
+  url: "https://trello.com/c/abc123/a-card",
+  imageUrl: "https://example.com/image.jpg",
+};
+
+export const buildAction = (args?: Partial<ActionArgs>) =>
+  new Action({
+    ...ACTION_DEFAULTS,
+    ...args,
+  });
 
 const NOW = new Date(2020, 0, 15, 10, 30, 0);
 const ONE_SECOND = 1000;
@@ -10,22 +23,13 @@ beforeEach(() => MockDate.set(NOW));
 afterEach(() => MockDate.reset());
 
 test("actions with no due date are not overdue", () => {
-  const action = new Action({
-    id: "1",
-    name: "Action",
-    url: "",
-    imageUrl: "",
-  });
+  const action = buildAction();
 
   expect(action.isOverdue()).toBeFalsy();
 });
 
 test("actions due in the past are overdue", () => {
-  const action = new Action({
-    id: "1",
-    name: "Action",
-    url: "",
-    imageUrl: "",
+  const action = buildAction({
     dueBy: new Date(NOW.getTime() - ONE_SECOND),
   });
 
@@ -33,11 +37,7 @@ test("actions due in the past are overdue", () => {
 });
 
 test("actions due now are not overdue", () => {
-  const action = new Action({
-    id: "1",
-    name: "Action",
-    url: "",
-    imageUrl: "",
+  const action = buildAction({
     dueBy: NOW,
   });
 
@@ -45,22 +45,13 @@ test("actions due now are not overdue", () => {
 });
 
 test("actions with no due date are not due soon", () => {
-  const action = new Action({
-    id: "1",
-    name: "Action",
-    url: "",
-    imageUrl: "",
-  });
+  const action = buildAction();
 
   expect(action.isDueSoon()).toBeFalsy();
 });
 
 test("actions due in less than a day are due soon", () => {
-  const action = new Action({
-    id: "1",
-    name: "Action",
-    url: "",
-    imageUrl: "",
+  const action = buildAction({
     dueBy: new Date(NOW.getTime() + TWENTY_FOUR_HOURS - ONE_SECOND),
   });
 
@@ -68,11 +59,7 @@ test("actions due in less than a day are due soon", () => {
 });
 
 test("actions due in a day are not due soon", () => {
-  const action = new Action({
-    id: "1",
-    name: "Action",
-    url: "",
-    imageUrl: "",
+  const action = buildAction({
     dueBy: new Date(NOW.getTime() + TWENTY_FOUR_HOURS),
   });
 

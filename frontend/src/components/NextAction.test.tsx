@@ -3,6 +3,7 @@ import MockDate from "mockdate";
 import { render } from "@testing-library/react";
 import { Action } from "../models/Action";
 import { NextAction } from "./NextAction";
+import { buildAction } from "../models/Action.test";
 
 const NOW = new Date(2020, 0, 15, 10, 30, 0);
 const ONE_SECOND = 1000;
@@ -13,11 +14,8 @@ beforeEach(() => MockDate.set(NOW));
 afterEach(() => MockDate.reset());
 
 test("displays action name", () => {
-  const anAction = new Action({
-    id: "1",
+  const anAction = buildAction({
     name: "An action",
-    url: "",
-    imageUrl: "",
   });
 
   const { getByText } = render(<NextAction action={anAction} />);
@@ -28,11 +26,9 @@ test("displays action name", () => {
 });
 
 test("links the action to the specified URL", () => {
-  const action = new Action({
-    id: "1",
+  const action = buildAction({
     name: "An action",
     url: "https://example.com/",
-    imageUrl: "",
   });
 
   const { getByText } = render(<NextAction action={action} />);
@@ -44,11 +40,8 @@ test("links the action to the specified URL", () => {
 
 test("displays action due date", () => {
   const later = new Date(NOW.getTime() + TWENTY_FOUR_HOURS);
-  const anAction = new Action({
-    id: "1",
+  const anAction = buildAction({
     name: "An action",
-    url: "",
-    imageUrl: "",
     dueBy: later,
   });
 
@@ -63,11 +56,8 @@ test("displays action due date", () => {
 test("highlights overdue due dates", () => {
   const overdue = new Date(NOW.getTime() - ONE_SECOND);
 
-  const overdueAction = new Action({
-    id: "1",
+  const overdueAction = buildAction({
     name: "An overdue action",
-    url: "",
-    imageUrl: "",
     dueBy: overdue,
   });
 
@@ -81,11 +71,8 @@ test("highlights overdue due dates", () => {
 test("highlights due dates in the near future", () => {
   const soon = new Date(NOW.getTime() + TWENTY_FOUR_HOURS - ONE_SECOND);
 
-  const overdueAction = new Action({
-    id: "1",
+  const overdueAction = buildAction({
     name: "An action due soon",
-    url: "",
-    imageUrl: "",
     dueBy: soon,
   });
 
@@ -97,10 +84,8 @@ test("highlights due dates in the near future", () => {
 });
 
 test("displays the relevant image for the action", () => {
-  const actionWithImage = new Action({
-    id: "1",
+  const actionWithImage = buildAction({
     name: "An action with image",
-    url: "",
     imageUrl: "example.jpg",
   });
 
