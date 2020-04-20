@@ -1,4 +1,4 @@
-interface ActionArgs {
+export interface ActionArgs {
   id: string;
   name: string;
   url: string;
