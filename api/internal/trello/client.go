@@ -90,6 +90,7 @@ type List struct {
 // Board represents a Trello board returned via the API
 type Board struct {
 	ID          string      `json:"id"`
+	Name        string      `json:"name"`
 	Preferences Preferences `json:"prefs"`
 }
 

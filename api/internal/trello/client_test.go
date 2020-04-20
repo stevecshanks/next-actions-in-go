@@ -124,8 +124,8 @@ func TestClientGetBoard(t *testing.T) {
 		{*backgroundURL1},
 		{*backgroundURL2},
 	}
-	expectedBoard := Board{"myBoardId", Preferences{backgroundImages}}
-	if expectedBoard.ID != board.ID {
+	expectedBoard := Board{"myBoardId", "My Project", Preferences{backgroundImages}}
+	if expectedBoard.ID != board.ID || expectedBoard.Name != board.Name {
 		t.Errorf(fmt.Sprintf("GetBoard returned incorrect board, expected %+v got %+v", expectedBoard, board))
 	}
 	if len(expectedBoard.Preferences.BackgroundImages) != len(board.Preferences.BackgroundImages) {

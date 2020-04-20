@@ -6,6 +6,7 @@ const ACTION_DEFAULTS = {
   name: "An Action",
   url: "https://trello.com/c/abc123/a-card",
   imageUrl: "https://example.com/image.jpg",
+  projectName: "A Project",
 };
 
 export const buildAction = (args?: Partial<ActionArgs>) =>

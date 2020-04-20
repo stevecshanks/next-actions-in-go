@@ -25,6 +25,7 @@ export const NextAction: React.FC<NextActionProps> = ({ action }) => (
       </Badge>
     ) : null}
     <ActionImage url={action.imageUrl} />
+    <h1>{action.projectName}</h1>
     {action.name}
   </ListGroup.Item>
 );

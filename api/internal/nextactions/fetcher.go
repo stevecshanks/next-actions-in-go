@@ -184,11 +184,12 @@ func cardsToActions(cards []trello.Card, boardsByID map[string]*trello.Board) []
 	for i := range cards {
 		card := &cards[i]
 		actions = append(actions, Action{
-			ID:       card.ID,
-			Name:     card.Name,
-			DueBy:    card.DueBy,
-			URL:      card.URL,
-			ImageURL: boardsByID[card.BoardID].Preferences.BackgroundImages[0].URL,
+			ID:          card.ID,
+			Name:        card.Name,
+			DueBy:       card.DueBy,
+			URL:         card.URL,
+			ImageURL:    boardsByID[card.BoardID].Preferences.BackgroundImages[0].URL,
+			ProjectName: boardsByID[card.BoardID].Name,
 		})
 	}
 	return actions
