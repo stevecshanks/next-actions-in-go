@@ -6,10 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
-
 	"github.com/stevecshanks/next-actions-in-go/api/internal/config"
-	"github.com/stevecshanks/next-actions-in-go/api/internal/nextactions/mock_nextactions"
 	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 )
 
@@ -25,9 +22,47 @@ func testImageURL(size string) url.URL {
 	return *imageURL
 }
 
-func testBoard() *trello.Board {
+type fakeTrelloClient struct {
+	ownedCards         []trello.Card
+	cardsOnLists       map[string][]trello.Card
+	listsOnBoards      map[string][]trello.List
+	ownedCardsError    error
+	cardsOnListErrors  map[string]error
+	listsOnBoardErrors map[string]error
+}
+
+func (f *fakeTrelloClient) OwnedCards() ([]trello.Card, error) {
+	if f.ownedCardsError != nil {
+		return nil, f.ownedCardsError
+	}
+	return f.ownedCards, nil
+}
+
+func (f *fakeTrelloClient) CardsOnList(listID string) ([]trello.Card, error) {
+	if f.cardsOnListErrors[listID] != nil {
+		return nil, f.cardsOnListErrors[listID]
+	}
+	cards, ok := f.cardsOnLists[listID]
+	if !ok {
+		return []trello.Card{}, nil
+	}
+	return cards, nil
+}
+
+func (f *fakeTrelloClient) ListsOnBoard(boardID string) ([]trello.List, error) {
+	if f.listsOnBoardErrors[boardID] != nil {
+		return nil, f.listsOnBoardErrors[boardID]
+	}
+	lists, ok := f.listsOnBoards[boardID]
+	if !ok {
+		return []trello.List{}, nil
+	}
+	return lists, nil
+}
+
+func (f *fakeTrelloClient) GetBoard(boardID string) (*trello.Board, error) {
 	return &trello.Board{
-		ID:   "boardId",
+		ID:   boardID,
 		Name: "My Project",
 		Preferences: trello.Preferences{
 			BackgroundImages: []trello.BackgroundImage{
@@ -35,22 +70,50 @@ func testBoard() *trello.Board {
 				{URL: testImageURL("144x192")},
 			},
 		},
+	}, nil
+}
+
+func (f *fakeTrelloClient) AddOwnedCard(card *trello.Card) {
+	f.ownedCards = append(f.ownedCards, *card)
+}
+
+func (f *fakeTrelloClient) AddCardOnList(listID string, card *trello.Card) {
+	f.cardsOnLists[listID] = append(f.cardsOnLists[listID], *card)
+}
+
+func (f *fakeTrelloClient) AddListOnBoard(boardID string, list *trello.List) {
+	f.listsOnBoards[boardID] = append(f.listsOnBoards[boardID], *list)
+}
+
+func (f *fakeTrelloClient) SetOwnedCardsError(err error) {
+	f.ownedCardsError = err
+}
+
+func (f *fakeTrelloClient) SetCardsOnListError(listID string, err error) {
+	f.cardsOnListErrors[listID] = err
+}
+
+func (f *fakeTrelloClient) SetListsOnBoardError(boardID string, err error) {
+	f.listsOnBoardErrors[boardID] = err
+}
+
+func aFakeTrelloClient() *fakeTrelloClient {
+	return &fakeTrelloClient{
+		cardsOnLists:       make(map[string][]trello.Card),
+		listsOnBoards:      make(map[string][]trello.List),
+		cardsOnListErrors:  make(map[string]error),
+		listsOnBoardErrors: make(map[string]error),
 	}
 }
 
 func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
-
 	cardURL, _ := url.Parse("https://example.com")
-	ownedCards := []trello.Card{{ID: "an id", Name: "a name", URL: *cardURL, BoardID: "boardId"}}
-	mockClient.EXPECT().OwnedCards().Return(ownedCards, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Any()).Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().GetBoard("boardId").Return(testBoard(), nil).AnyTimes()
+	ownedCard := trello.Card{ID: "an id", Name: "a name", URL: *cardURL, BoardID: "boardId"}
 
-	fetcher := Fetcher{mockClient, testConfig()}
+	fakeClient := aFakeTrelloClient()
+	fakeClient.AddOwnedCard(&ownedCard)
+
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
@@ -61,7 +124,7 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 		t.Errorf("Unexpected error: %s", err)
 	}
 	if len(expectedActions) != len(actions) {
-		t.Errorf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
+		t.Fatalf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
 	}
 	if expectedActions[0] != actions[0] {
 		t.Errorf("Incorrect actions returned, expected %+v but got %+v", expectedActions, actions)
@@ -69,15 +132,12 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 }
 
 func TestErrorWithOwnedCardsReturnsError(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
-
 	expectedError := fmt.Errorf("an error")
-	mockClient.EXPECT().OwnedCards().Return(nil, expectedError).AnyTimes()
 
-	fetcher := Fetcher{mockClient, testConfig()}
+	fakeClient := aFakeTrelloClient()
+	fakeClient.SetOwnedCardsError(expectedError)
+
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	if err != expectedError {
@@ -89,18 +149,12 @@ func TestErrorWithOwnedCardsReturnsError(t *testing.T) {
 }
 
 func TestCardsInNextActionsListAreReturnedAsActions(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	nextActionsCard := trello.Card{ID: "an id", Name: "a name", BoardID: "boardId"}
 
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
+	fakeClient := aFakeTrelloClient()
+	fakeClient.AddCardOnList("nextActionsListId", &nextActionsCard)
 
-	nextActionsCards := []trello.Card{{ID: "an id", Name: "a name", BoardID: "boardId"}}
-	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return(nextActionsCards, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("projectsListId")).Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().GetBoard("boardId").Return(testBoard(), nil).AnyTimes()
-
-	fetcher := Fetcher{mockClient, testConfig()}
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
@@ -111,7 +165,7 @@ func TestCardsInNextActionsListAreReturnedAsActions(t *testing.T) {
 		t.Errorf("Unexpected error: %s", err)
 	}
 	if len(expectedActions) != len(actions) {
-		t.Errorf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
+		t.Fatalf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
 	}
 	if expectedActions[0] != actions[0] {
 		t.Errorf("Incorrect actions returned, expected %+v but got %+v", expectedActions, actions)
@@ -119,16 +173,12 @@ func TestCardsInNextActionsListAreReturnedAsActions(t *testing.T) {
 }
 
 func TestErrorWithCardsOnListReturnsError(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
-
 	expectedError := fmt.Errorf("an error")
-	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return(nil, expectedError).AnyTimes()
 
-	fetcher := Fetcher{mockClient, testConfig()}
+	fakeClient := aFakeTrelloClient()
+	fakeClient.SetCardsOnListError("nextActionsListId", expectedError)
+
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	if err != expectedError {
@@ -140,17 +190,12 @@ func TestErrorWithCardsOnListReturnsError(t *testing.T) {
 }
 
 func TestErrorWithCardsOnProjectsListReturnsError(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
-
 	expectedError := fmt.Errorf("an error")
-	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("projectsListId")).Return(nil, expectedError).AnyTimes()
 
-	fetcher := Fetcher{mockClient, testConfig()}
+	fakeClient := aFakeTrelloClient()
+	fakeClient.SetCardsOnListError("projectsListId", expectedError)
+
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	if err != expectedError {
@@ -162,17 +207,12 @@ func TestErrorWithCardsOnProjectsListReturnsError(t *testing.T) {
 }
 
 func TestMissingDescriptionOnProjectCardReturnsError(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	brokenProjectCard := trello.Card{ID: "an id", Name: "a name", Description: "invalid"}
 
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
+	fakeClient := aFakeTrelloClient()
+	fakeClient.AddCardOnList("projectsListId", &brokenProjectCard)
 
-	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "invalid"}
-	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("projectsListId")).Return([]trello.Card{projectCard}, nil).AnyTimes()
-
-	fetcher := Fetcher{mockClient, testConfig()}
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	if err == nil {
@@ -184,19 +224,14 @@ func TestMissingDescriptionOnProjectCardReturnsError(t *testing.T) {
 }
 
 func TestErrorWithListsOnBoardReturnsError(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
-
 	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/broken/a-broken-card"}
 	expectedError := fmt.Errorf("an error")
-	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("projectsListId")).Return([]trello.Card{projectCard}, nil).AnyTimes()
-	mockClient.EXPECT().ListsOnBoard(gomock.Eq("broken")).Return(nil, expectedError).AnyTimes()
 
-	fetcher := Fetcher{mockClient, testConfig()}
+	fakeClient := aFakeTrelloClient()
+	fakeClient.AddCardOnList("projectsListId", &projectCard)
+	fakeClient.SetListsOnBoardError("broken", expectedError)
+
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	if err != expectedError {
@@ -208,18 +243,12 @@ func TestErrorWithListsOnBoardReturnsError(t *testing.T) {
 }
 
 func TestMissingTodoListOnProjectBoardReturnsError(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
-
 	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/empty"}
-	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("projectsListId")).Return([]trello.Card{projectCard}, nil).AnyTimes()
-	mockClient.EXPECT().ListsOnBoard(gomock.Eq("empty")).Return([]trello.List{}, nil).AnyTimes()
 
-	fetcher := Fetcher{mockClient, testConfig()}
+	fakeClient := aFakeTrelloClient()
+	fakeClient.AddCardOnList("projectsListId", &projectCard)
+
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	if err == nil {
@@ -231,22 +260,16 @@ func TestMissingTodoListOnProjectBoardReturnsError(t *testing.T) {
 }
 
 func TestErrorWithTodoListReturnsError(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
-
 	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/aBoardId"}
 	todoList := trello.List{ID: "todoListId", Name: "Todo"}
-	anotherList := trello.List{ID: "anotherListId", Name: "Another"}
 	expectedError := fmt.Errorf("an error")
-	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("projectsListId")).Return([]trello.Card{projectCard}, nil).AnyTimes()
-	mockClient.EXPECT().ListsOnBoard(gomock.Eq("aBoardId")).Return([]trello.List{todoList, anotherList}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("todoListId")).Return(nil, expectedError).AnyTimes()
 
-	fetcher := Fetcher{mockClient, testConfig()}
+	fakeClient := aFakeTrelloClient()
+	fakeClient.AddCardOnList("projectsListId", &projectCard)
+	fakeClient.AddListOnBoard("aBoardId", &todoList)
+	fakeClient.SetCardsOnListError("todoListId", expectedError)
+
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	if err != expectedError {
@@ -258,20 +281,14 @@ func TestErrorWithTodoListReturnsError(t *testing.T) {
 }
 
 func TestEmptyTodoListDoesNotReturnAnAction(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
-
 	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/aBoardId"}
 	todoList := trello.List{ID: "todoListId", Name: "Todo"}
-	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("projectsListId")).Return([]trello.Card{projectCard}, nil).AnyTimes()
-	mockClient.EXPECT().ListsOnBoard(gomock.Eq("aBoardId")).Return([]trello.List{todoList}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("todoListId")).Return([]trello.Card{}, nil).AnyTimes()
 
-	fetcher := Fetcher{mockClient, testConfig()}
+	fakeClient := aFakeTrelloClient()
+	fakeClient.AddCardOnList("projectsListId", &projectCard)
+	fakeClient.AddListOnBoard("aBoardId", &todoList)
+
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	if err != nil {
@@ -283,25 +300,16 @@ func TestEmptyTodoListDoesNotReturnAnAction(t *testing.T) {
 }
 
 func TestFirstTodoListItemsAreReturnedAsActions(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
-
 	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/aBoardId"}
 	todoList := trello.List{ID: "todoListId", Name: "Todo"}
-	todoListCards := []trello.Card{
-		{ID: "an id", Name: "a name", BoardID: "boardId"},
-		{ID: "another id", Name: "another name", BoardID: "boardId"},
-	}
-	mockClient.EXPECT().OwnedCards().Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("nextActionsListId")).Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("projectsListId")).Return([]trello.Card{projectCard}, nil).AnyTimes()
-	mockClient.EXPECT().ListsOnBoard(gomock.Eq("aBoardId")).Return([]trello.List{todoList}, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Eq("todoListId")).Return(todoListCards, nil).AnyTimes()
-	mockClient.EXPECT().GetBoard("boardId").Return(testBoard(), nil).AnyTimes()
 
-	fetcher := Fetcher{mockClient, testConfig()}
+	fakeClient := aFakeTrelloClient()
+	fakeClient.AddCardOnList("projectsListId", &projectCard)
+	fakeClient.AddListOnBoard("aBoardId", &todoList)
+	fakeClient.AddCardOnList("todoListId", &trello.Card{ID: "an id", Name: "a name", BoardID: "boardId"})
+	fakeClient.AddCardOnList("todoListId", &trello.Card{ID: "another id", Name: "another name", BoardID: "boardId"})
+
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
@@ -312,7 +320,7 @@ func TestFirstTodoListItemsAreReturnedAsActions(t *testing.T) {
 		t.Errorf("Unexpected error: %s", err)
 	}
 	if len(expectedActions) != len(actions) {
-		t.Errorf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
+		t.Fatalf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
 	}
 	if expectedActions[0] != actions[0] {
 		t.Errorf("Incorrect actions returned, expected %+v but got %+v", expectedActions, actions)
@@ -320,18 +328,13 @@ func TestFirstTodoListItemsAreReturnedAsActions(t *testing.T) {
 }
 
 func TestCardDueByDateIsAddedToActions(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mock_nextactions.NewMockTrelloClient(ctrl)
-
 	dueBy, _ := time.Parse(time.RFC3339, "2020-02-12T16:24:00.000Z")
-	ownedCards := []trello.Card{{ID: "an id", Name: "a name", DueBy: &dueBy, BoardID: "boardId"}}
-	mockClient.EXPECT().OwnedCards().Return(ownedCards, nil).AnyTimes()
-	mockClient.EXPECT().CardsOnList(gomock.Any()).Return([]trello.Card{}, nil).AnyTimes()
-	mockClient.EXPECT().GetBoard("boardId").Return(testBoard(), nil).AnyTimes()
+	ownedCard := trello.Card{ID: "an id", Name: "a name", DueBy: &dueBy, BoardID: "boardId"}
 
-	fetcher := Fetcher{mockClient, testConfig()}
+	fakeClient := aFakeTrelloClient()
+	fakeClient.AddOwnedCard(&ownedCard)
+
+	fetcher := Fetcher{fakeClient, testConfig()}
 	actions, err := fetcher.Fetch()
 
 	expectedActions := []Action{
@@ -342,7 +345,7 @@ func TestCardDueByDateIsAddedToActions(t *testing.T) {
 		t.Errorf("Unexpected error: %s", err)
 	}
 	if len(expectedActions) != len(actions) {
-		t.Errorf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
+		t.Fatalf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
 	}
 	if expectedActions[0] != actions[0] {
 		t.Errorf("Incorrect actions returned, expected %+v but got %+v", expectedActions, actions)
