@@ -29,7 +29,7 @@ test: test_api test_frontend
 lint: lint_api lint_frontend
 
 test_api:
-	cd api && go test ./...
+	cd api && go test -race ./...
 
 lint_api:
 	cd api && golangci-lint run
