@@ -26,8 +26,8 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      - run: make go_lint
-      - run: make go_tests
+      - run: make lint_api
+      - run: make test_api
   deploy:
     docker:
       - image: circleci/golang:1.13
