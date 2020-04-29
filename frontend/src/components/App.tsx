@@ -22,7 +22,7 @@ const actionsFromJson = (json: JsonAction[]): Action[] =>
       new Action({
         ...action,
         dueBy: action.dueBy ? new Date(action.dueBy) : undefined,
-      }),
+      })
   );
 
 const App: React.FC = () => {
@@ -38,7 +38,7 @@ const App: React.FC = () => {
 
   const updateNotificationCount = () => {
     const notificationCount = actions.filter(
-      (action) => action.isOverdue() || action.isDueSoon(),
+      (action) => action.isOverdue() || action.isDueSoon()
     ).length;
     const notificationText = notificationCount ? `(${notificationCount}) ` : "";
     document.title = `${notificationText}Next Actions`;

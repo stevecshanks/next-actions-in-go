@@ -3,22 +3,21 @@ jobs:
   frontend_tests:
     docker:
       - image: circleci/node:12.13
-    working_directory: ~/repo/frontend
+    working_directory: ~/repo
     steps:
       - checkout:
           path: ~/repo
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-{{ checksum "frontend/package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-      - run: npm ci
+      - run: cd frontend && npm ci
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-      - run: npm run compile
-      - run: npm test
+          key: v1-dependencies-{{ checksum "frontend/package-lock.json" }}
+      - run: make test_frontend
   api_tests:
     docker:
       - image: golangci/golangci-lint:v1.23.8
@@ -26,8 +25,8 @@ jobs:
     steps:
       - checkout:
           path: ~/repo
-      - run: make go_lint
-      - run: make go_tests
+      - run: make lint_api
+      - run: make test_api
   deploy:
     docker:
       - image: circleci/golang:1.13
