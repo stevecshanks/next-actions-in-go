@@ -1,4 +1,4 @@
-.PHONY: dev prod build push deploy install test lint test_api lint_api test_frontend
+.PHONY: dev prod build push deploy install test lint test_api lint_api test_frontend lint_frontend
 
 dev:
 	source .env && docker-compose up
@@ -26,7 +26,7 @@ frontend/node_modules: frontend/package.json
 
 test: test_api test_frontend
 
-lint: lint_api
+lint: lint_api lint_frontend
 
 test_api:
 	cd api && go test ./...
@@ -36,3 +36,6 @@ lint_api:
 
 test_frontend: install
 	cd frontend && npm run compile && CI=true npm test
+
+lint_frontend: install
+	cd frontend && npm run lint
