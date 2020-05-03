@@ -12,9 +12,25 @@ import (
 	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 )
 
+type APIError struct {
+	Detail string `json:"detail"`
+}
+
 func handleError(w http.ResponseWriter, err error) {
 	fmt.Printf("Error: %s\n", err)
-	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+
+	apiErrors := []APIError{{err.Error()}}
+
+	body, err := json.Marshal(map[string][]APIError{"errors": apiErrors})
+	if err != nil {
+		panic(err)
+	}
+
+	w.WriteHeader(http.StatusInternalServerError)
+	_, err = w.Write(body)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func actions(w http.ResponseWriter, req *http.Request) {
@@ -35,6 +51,7 @@ func actions(w http.ResponseWriter, req *http.Request) {
 	actions, err := fetcher.Fetch()
 	if err != nil {
 		handleError(w, err)
+		return
 	}
 
 	fmt.Printf("Finished API requests, took %s\n", time.Since(startTime))

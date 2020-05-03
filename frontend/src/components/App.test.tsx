@@ -109,3 +109,24 @@ test("renders an error if the API call fails", async () => {
   const error = await findByText("An error occurred");
   expect(error).toBeInTheDocument();
 });
+
+test("renders errors returned from the API", async () => {
+  const response = {
+    errors: [
+      {
+        detail: "a bad thing",
+      },
+      {
+        detail: "another bad thing",
+      },
+    ],
+  };
+  fetchMock.mockResponse(JSON.stringify(response), { status: 500 });
+
+  const { findByText } = render(<App />);
+
+  const error = await findByText("An error occurred: a bad thing");
+  expect(error).toBeInTheDocument();
+  const anotherError = await findByText("An error occurred: another bad thing");
+  expect(anotherError).toBeInTheDocument();
+});
