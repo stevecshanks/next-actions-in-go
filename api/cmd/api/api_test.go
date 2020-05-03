@@ -78,3 +78,29 @@ func TestActions(t *testing.T) {
 		t.Errorf("/actions returned incorrect body:\nexpected: %v\nactual:   %v", expected, rr.Body.String())
 	}
 }
+
+func TestActionsErrors(t *testing.T) {
+	trello.CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	defer trello.TeardownMockServer()
+
+	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123", "projectsList456")
+	defer config.TeardownEnvironment()
+
+	req, err := http.NewRequest("GET", "/actions", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(actions)
+
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusInternalServerError {
+		t.Errorf("/actions returned status: %v", status)
+	}
+
+	expected := `{"errors":[{"detail":"request to /members/me/cards returned status code 404"}]}`
+	if rr.Body.String() != expected {
+		t.Errorf("/actions returned incorrect body:\nexpected: %v\nactual:   %v", expected, rr.Body.String())
+	}
+}
