@@ -41,18 +41,6 @@ const App: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
   const [errorMessages, setErrorMessages] = useState<String[]>([]);
 
-  const handleApiResponse = async (response: Response) => {
-    const json = (await response.json()) as JsonResponse;
-    setActions(actionsFromJson(json.data || []));
-    setErrorMessages(errorsFromJson(json.errors || []));
-  };
-
-  const fetchActions = () => {
-    fetch("api/actions")
-      .then(handleApiResponse)
-      .catch(() => setErrorMessages(["An error occurred"]));
-  };
-
   const updateNotificationCount = () => {
     const notificationCount = actions.filter(
       (action) => action.isOverdue() || action.isDueSoon()
@@ -62,6 +50,17 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
+    const fetchActions = async () => {
+      try {
+        const response = await fetch("api/actions");
+        const json = (await response.json()) as JsonResponse;
+        setActions(actionsFromJson(json.data || []));
+        setErrorMessages(errorsFromJson(json.errors || []));
+      } catch {
+        setErrorMessages(["An error occurred"]);
+      }
+    };
+
     fetchActions();
     setInterval(fetchActions, ONE_HOUR);
   }, []);
