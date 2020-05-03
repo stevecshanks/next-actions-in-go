@@ -138,6 +138,24 @@ func TestClientGetBoard(t *testing.T) {
 	}
 }
 
+func TestClientHandlesHTTPErrors(t *testing.T) {
+	CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	defer TeardownMockServer()
+
+	baseURL, _ := url.Parse("https://api.trello.com/1")
+	client := Client{baseURL, "some key", "some token"}
+
+	_, err := client.GetBoard("myBoardId")
+	if err == nil {
+		t.Error("Client did not return 404 error", err)
+	}
+
+	expectedError := fmt.Errorf("request to %s returned status code %d", BoardPath("myBoardId"), 404)
+	if err.Error() != expectedError.Error() {
+		t.Errorf("Expected error %s, got %s", expectedError, err)
+	}
+}
+
 func cardsAreEqual(card, other *Card) bool {
 	return (card.ID == other.ID &&
 		card.Name == other.Name &&

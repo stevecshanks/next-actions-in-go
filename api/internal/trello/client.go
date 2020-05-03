@@ -212,5 +212,13 @@ func (c *Client) get(relativePath string) (*http.Response, error) {
 		return nil, err
 	}
 
-	return client.Do(req)
+	response, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if response.StatusCode >= 300 {
+		return nil, fmt.Errorf("request to %s returned status code %d", relativePath, response.StatusCode)
+	}
+
+	return response, nil
 }

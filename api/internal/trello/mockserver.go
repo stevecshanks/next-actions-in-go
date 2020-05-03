@@ -22,6 +22,9 @@ func CreateMockServer(baseURL, key, token string) *MockServer {
 	if err != nil {
 		panic(err)
 	}
+
+	httpmock.RegisterNoResponder(httpmock.NewStringResponder(404, "Not Found"))
+
 	return &MockServer{parsedURL, key, token}
 }
 
