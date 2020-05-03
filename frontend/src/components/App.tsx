@@ -16,6 +16,15 @@ type JsonAction = {
   dueBy?: string;
 };
 
+type JsonError = {
+  detail: string;
+};
+
+type JsonResponse = {
+  data?: JsonAction[];
+  errors?: JsonError[];
+};
+
 const actionsFromJson = (json: JsonAction[]): Action[] =>
   json.map(
     (action) =>
@@ -25,15 +34,23 @@ const actionsFromJson = (json: JsonAction[]): Action[] =>
       })
   );
 
+const errorsFromJson = (json: JsonError[]): String[] =>
+  json.map((error) => `An error occurred: ${error.detail}`);
+
 const App: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
-  const [errorMessage, setErrorMessage] = useState<String | null>(null);
+  const [errorMessages, setErrorMessages] = useState<String[]>([]);
+
+  const handleApiResponse = async (response: Response) => {
+    const json = (await response.json()) as JsonResponse;
+    setActions(actionsFromJson(json.data || []));
+    setErrorMessages(errorsFromJson(json.errors || []));
+  };
 
   const fetchActions = () => {
     fetch("api/actions")
-      .then((response) => response.json())
-      .then((json) => setActions(actionsFromJson(json.data)))
-      .catch(() => setErrorMessage("An error occurred"));
+      .then(handleApiResponse)
+      .catch(() => setErrorMessages(["An error occurred"]));
   };
 
   const updateNotificationCount = () => {
@@ -53,7 +70,11 @@ const App: React.FC = () => {
 
   return (
     <>
-      {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+      {errorMessages.map((message, i) => (
+        <Alert key={`error-${i}`} variant="danger">
+          {message}
+        </Alert>
+      ))}
       <NextActionsList actions={actions} />
     </>
   );
