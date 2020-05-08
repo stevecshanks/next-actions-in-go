@@ -1,6 +1,7 @@
 import React from "react";
 import Badge, { BadgeProps } from "react-bootstrap/Badge";
 import ListGroup from "react-bootstrap/ListGroup";
+import Skeleton from "react-loading-skeleton";
 import { Action } from "../models/Action";
 
 type NextActionProps = {
@@ -30,6 +31,16 @@ export const NextAction: React.FC<NextActionProps> = ({ action }) => (
   </ListGroup.Item>
 );
 
+export const NextActionSkeleton: React.FC = () => (
+  <ListGroup.Item action>
+    <ActionImageSkeleton />
+    <h1>
+      <Skeleton width={"30%"} />
+    </h1>
+    <Skeleton width={"70%"} />
+  </ListGroup.Item>
+);
+
 const ActionImage: React.FC<{ url: string }> = ({ url }) => (
   <div
     className="action-image"
@@ -37,4 +48,8 @@ const ActionImage: React.FC<{ url: string }> = ({ url }) => (
       backgroundImage: `url("${url}")`,
     }}
   />
+);
+
+const ActionImageSkeleton: React.FC = () => (
+  <div className="action-image-skeleton" />
 );

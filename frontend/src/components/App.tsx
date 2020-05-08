@@ -40,6 +40,7 @@ const errorsFromJson = (json: JsonError[]): String[] =>
 const App: React.FC = () => {
   const [actions, setActions] = useState<Action[]>([]);
   const [errorMessages, setErrorMessages] = useState<String[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const updateNotificationCount = () => {
     const notificationCount = actions.filter(
@@ -51,6 +52,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const fetchActions = async () => {
+      setIsLoading(true);
+
       try {
         const response = await fetch("api/actions");
         const json = (await response.json()) as JsonResponse;
@@ -59,6 +62,8 @@ const App: React.FC = () => {
       } catch {
         setErrorMessages(["An error occurred"]);
       }
+
+      setIsLoading(false);
     };
 
     fetchActions();
@@ -74,7 +79,7 @@ const App: React.FC = () => {
           {message}
         </Alert>
       ))}
-      <NextActionsList actions={actions} />
+      <NextActionsList actions={actions} isLoading={isLoading} />
     </>
   );
 };
