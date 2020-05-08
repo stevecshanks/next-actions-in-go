@@ -1,10 +1,11 @@
 import React from "react";
 import ListGroup from "react-bootstrap/ListGroup";
-import { NextAction } from "./NextAction";
+import { NextAction, NextActionSkeleton } from "./NextAction";
 import { Action } from "../models/Action";
 
 type NextActionsListProps = {
   actions: Action[];
+  isLoading: boolean;
 };
 
 const maxDate = new Date(8640000000000000);
@@ -21,6 +22,7 @@ const sortActions = (actions: Action[]): Action[] =>
 
 export const NextActionsList: React.FC<NextActionsListProps> = ({
   actions,
+  isLoading,
 }) => {
   const sortedActions = sortActions(actions);
 
@@ -29,6 +31,12 @@ export const NextActionsList: React.FC<NextActionsListProps> = ({
       {sortedActions.map((action: Action) => (
         <NextAction key={action.id} action={action} />
       ))}
+      {isLoading && (
+        <>
+          <NextActionSkeleton />
+          <NextActionSkeleton />
+        </>
+      )}
     </ListGroup>
   );
 };

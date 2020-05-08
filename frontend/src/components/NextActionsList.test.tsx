@@ -10,7 +10,9 @@ test("renders the list of actions", () => {
     buildAction({ id: "2", name: "Another action" }),
   ];
 
-  const { getByText } = render(<NextActionsList actions={actions} />);
+  const { getByText } = render(
+    <NextActionsList actions={actions} isLoading={false} />
+  );
 
   const action = getByText("An action");
   const anotherAction = getByText("Another action");
@@ -36,7 +38,9 @@ test("sorts actions by due date", () => {
     }),
   ];
 
-  const { getAllByText } = render(<NextActionsList actions={actions} />);
+  const { getAllByText } = render(
+    <NextActionsList actions={actions} isLoading={false} />
+  );
 
   const foundActions = getAllByText("An action", { exact: false });
 

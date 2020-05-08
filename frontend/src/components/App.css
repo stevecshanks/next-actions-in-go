@@ -51,6 +51,15 @@ body {
   margin-right: 0.4rem;
 }
 
+.action-image-skeleton {
+  float: left;
+  height: 3rem;
+  width: 3rem;
+  border-radius: 0.25rem 0 0 0.25rem;
+  margin-right: 0.4rem;
+  background-color: #eee;
+}
+
 .list-group-item h1 {
   margin: 0;
   font-size: 0.9rem;
