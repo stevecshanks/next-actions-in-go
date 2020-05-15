@@ -15,7 +15,7 @@ func trelloResponse(fileName string) string {
 }
 
 func TestActions(t *testing.T) {
-	mockServer := trello.CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	mockServer := trello.CreateMockServer("some key", "some token")
 	defer trello.TeardownMockServer()
 
 	mockServer.AddFileResponse(trello.OwnedCardsPath(), trelloResponse("my_cards_response.json"))
@@ -40,7 +40,7 @@ func TestActions(t *testing.T) {
 		trelloResponse("board_response.json"),
 	)
 
-	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123", "projectsList456")
+	config.SetupEnvironment("some key", "some token", "nextActionsList123", "projectsList456")
 	defer config.TeardownEnvironment()
 
 	req, err := http.NewRequest("GET", "/actions", nil)
@@ -80,10 +80,10 @@ func TestActions(t *testing.T) {
 }
 
 func TestActionsErrors(t *testing.T) {
-	trello.CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	trello.CreateMockServer("some key", "some token")
 	defer trello.TeardownMockServer()
 
-	config.SetupEnvironment("https://api.trello.com/1", "some key", "some token", "nextActionsList123", "projectsList456")
+	config.SetupEnvironment("some key", "some token", "nextActionsList123", "projectsList456")
 	defer config.TeardownEnvironment()
 
 	req, err := http.NewRequest("GET", "/actions", nil)

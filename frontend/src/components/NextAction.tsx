@@ -32,7 +32,7 @@ export const NextAction: React.FC<NextActionProps> = ({ action }) => (
 );
 
 export const NextActionSkeleton: React.FC = () => (
-  <ListGroup.Item action>
+  <ListGroup.Item>
     <ActionImageSkeleton />
     <h1>
       <Skeleton width={"30%"} />

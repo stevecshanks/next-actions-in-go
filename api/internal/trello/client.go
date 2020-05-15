@@ -9,6 +9,9 @@ import (
 	"time"
 )
 
+const APIBaseURL = "https://api.trello.com/1"
+const BoardBaseURL = "https://trello.com/b/"
+
 // OwnedCardsPath returns the path on the Trello API server where a list of owned cards can be queried
 func OwnedCardsPath() string {
 	return "/members/me/cards"
@@ -119,9 +122,8 @@ type JSONBackgroundImage struct {
 
 // Client is used to interact with the Trello API
 type Client struct {
-	BaseURL *url.URL
-	Key     string
-	Token   string
+	Key   string
+	Token string
 }
 
 // OwnedCards will return the cards this user is a member of
@@ -202,8 +204,9 @@ func (c *Client) get(relativePath string) (*http.Response, error) {
 	queryParameters.Add("key", c.Key)
 	queryParameters.Add("token", c.Token)
 
-	fullURL := c.BaseURL.ResolveReference(&url.URL{
-		Path:     path.Join(c.BaseURL.Path, relativeURL.Path),
+	baseURL, _ := url.Parse(APIBaseURL)
+	fullURL := baseURL.ResolveReference(&url.URL{
+		Path:     path.Join(baseURL.Path, relativeURL.Path),
 		RawQuery: queryParameters.Encode(),
 	})
 

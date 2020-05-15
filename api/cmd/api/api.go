@@ -39,9 +39,8 @@ func actions(w http.ResponseWriter, req *http.Request) {
 		handleError(w, err)
 	}
 	client := trello.Client{
-		BaseURL: cfg.TrelloBaseURL,
-		Key:     cfg.TrelloKey,
-		Token:   cfg.TrelloToken,
+		Key:   cfg.TrelloKey,
+		Token: cfg.TrelloToken,
 	}
 
 	fetcher := nextactions.Fetcher{Client: &client, Config: cfg}
