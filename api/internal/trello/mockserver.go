@@ -10,22 +10,16 @@ import (
 
 // MockServer allows configuring mock responses from a Trello server
 type MockServer struct {
-	BaseURL *url.URL
-	Key     string
-	Token   string
+	Key   string
+	Token string
 }
 
 // CreateMockServer will create and activate a mock server
-func CreateMockServer(baseURL, key, token string) *MockServer {
+func CreateMockServer(key, token string) *MockServer {
 	httpmock.Activate()
-	parsedURL, err := url.Parse(baseURL)
-	if err != nil {
-		panic(err)
-	}
-
 	httpmock.RegisterNoResponder(httpmock.NewStringResponder(404, "Not Found"))
 
-	return &MockServer{parsedURL, key, token}
+	return &MockServer{key, token}
 }
 
 // TeardownMockServer will remove the mock server so HTTP responses will behave normally
@@ -50,8 +44,9 @@ func (m *MockServer) AddFileResponse(urlPath, filePath string) {
 	queryParameters.Add("key", m.Key)
 	queryParameters.Add("token", m.Token)
 
-	fullURL := m.BaseURL.ResolveReference(&url.URL{
-		Path: path.Join(m.BaseURL.Path, relativeURL.Path),
+	baseURL, _ := url.Parse(APIBaseURL)
+	fullURL := baseURL.ResolveReference(&url.URL{
+		Path: path.Join(baseURL.Path, relativeURL.Path),
 	})
 
 	httpmock.RegisterResponderWithQuery(

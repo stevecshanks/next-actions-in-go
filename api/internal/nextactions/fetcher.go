@@ -8,9 +8,6 @@ import (
 	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 )
 
-// Note: This is NOT the same as the API base URL
-const boardsURLPath = "https://trello.com/b/"
-
 type TrelloClient interface {
 	OwnedCards() ([]trello.Card, error)
 	CardsOnList(listID string) ([]trello.Card, error)
@@ -158,7 +155,7 @@ func (f *Fetcher) fetchBoard(boardID string, boardsChannel chan *trello.Board, e
 }
 
 func getProjectBoardID(projectCard *trello.Card) (string, error) {
-	boardIDRegex, err := regexp.Compile(regexp.QuoteMeta(boardsURLPath) + `(\w+).*`)
+	boardIDRegex, err := regexp.Compile(regexp.QuoteMeta(trello.BoardBaseURL) + `(\w+).*`)
 	if err != nil {
 		return "", err
 	}

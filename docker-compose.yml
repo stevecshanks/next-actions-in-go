@@ -9,7 +9,6 @@ services:
     volumes:
       - ./api:/go/src/next-actions/api
     environment:
-      - TRELLO_BASE_URL=https://api.trello.com/1
       - TRELLO_KEY=${TRELLO_KEY}
       - TRELLO_TOKEN=${TRELLO_TOKEN}
       - TRELLO_NEXT_ACTIONS_LIST_ID=${TRELLO_NEXT_ACTIONS_LIST_ID}

@@ -8,13 +8,12 @@ import (
 )
 
 func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
-	mockServer := CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	mockServer := CreateMockServer("some key", "some token")
 	defer TeardownMockServer()
 
 	mockServer.AddFileResponse(OwnedCardsPath(), "./testdata/my_cards_response.json")
 
-	baseURL, _ := url.Parse("https://api.trello.com/1")
-	client := Client{baseURL, "some key", "some token"}
+	client := Client{"some key", "some token"}
 
 	cards, err := client.OwnedCards()
 	if err != nil {
@@ -50,13 +49,12 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 }
 
 func TestClientCardsOnList(t *testing.T) {
-	mockServer := CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	mockServer := CreateMockServer("some key", "some token")
 	defer TeardownMockServer()
 
 	mockServer.AddFileResponse(CardsOnListPath("123"), "./testdata/next_actions_list_response.json")
 
-	baseURL, _ := url.Parse("https://api.trello.com/1")
-	client := Client{baseURL, "some key", "some token"}
+	client := Client{"some key", "some token"}
 
 	cards, err := client.CardsOnList("123")
 	if err != nil {
@@ -79,13 +77,12 @@ func TestClientCardsOnList(t *testing.T) {
 }
 
 func TestClientListsOnBoard(t *testing.T) {
-	mockServer := CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	mockServer := CreateMockServer("some key", "some token")
 	defer TeardownMockServer()
 
 	mockServer.AddFileResponse(ListsOnBoardPath("789"), "./testdata/board_lists_response.json")
 
-	baseURL, _ := url.Parse("https://api.trello.com/1")
-	client := Client{baseURL, "some key", "some token"}
+	client := Client{"some key", "some token"}
 
 	lists, err := client.ListsOnBoard("789")
 	if err != nil {
@@ -105,13 +102,12 @@ func TestClientListsOnBoard(t *testing.T) {
 }
 
 func TestClientGetBoard(t *testing.T) {
-	mockServer := CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	mockServer := CreateMockServer("some key", "some token")
 	defer TeardownMockServer()
 
 	mockServer.AddFileResponse(BoardPath("myBoardId"), "./testdata/board_response.json")
 
-	baseURL, _ := url.Parse("https://api.trello.com/1")
-	client := Client{baseURL, "some key", "some token"}
+	client := Client{"some key", "some token"}
 
 	board, err := client.GetBoard("myBoardId")
 	if err != nil {
@@ -139,11 +135,10 @@ func TestClientGetBoard(t *testing.T) {
 }
 
 func TestClientHandlesHTTPErrors(t *testing.T) {
-	CreateMockServer("https://api.trello.com/1", "some key", "some token")
+	CreateMockServer("some key", "some token")
 	defer TeardownMockServer()
 
-	baseURL, _ := url.Parse("https://api.trello.com/1")
-	client := Client{baseURL, "some key", "some token"}
+	client := Client{"some key", "some token"}
 
 	_, err := client.GetBoard("myBoardId")
 	if err == nil {

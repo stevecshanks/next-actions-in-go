@@ -2,13 +2,11 @@ package config
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 )
 
 // Config represents a configuration for the app
 type Config struct {
-	TrelloBaseURL           *url.URL
 	TrelloKey               string
 	TrelloToken             string
 	TrelloNextActionsListID string
@@ -17,15 +15,6 @@ type Config struct {
 
 // FromEnvironment creates a Config from environment variables
 func FromEnvironment() (*Config, error) {
-	trelloBaseURLString, err := requiredEnvironmentVariable("TRELLO_BASE_URL")
-	if err != nil {
-		return nil, err
-	}
-	trelloBaseURL, err := url.Parse(trelloBaseURLString)
-	if err != nil {
-		return nil, err
-	}
-
 	trelloKey, err := requiredEnvironmentVariable("TRELLO_KEY")
 	if err != nil {
 		return nil, err
@@ -47,7 +36,6 @@ func FromEnvironment() (*Config, error) {
 	}
 
 	return &Config{
-		TrelloBaseURL:           trelloBaseURL,
 		TrelloKey:               trelloKey,
 		TrelloToken:             trelloToken,
 		TrelloNextActionsListID: trelloNextActionsListID,
