@@ -24,7 +24,7 @@ func CreateMockServer(key, token string) *MockServer {
 
 // TeardownMockServer will remove the mock server so HTTP responses will behave normally
 func TeardownMockServer() {
-	defer httpmock.DeactivateAndReset()
+	httpmock.DeactivateAndReset()
 }
 
 // AddFileResponse will return the contents of the specified file when the specified path on the mock server is
