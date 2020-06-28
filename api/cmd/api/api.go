@@ -25,6 +25,7 @@ func handleError(w http.ResponseWriter, err error) {
 	if err != nil {
 		panic(err)
 	}
+	body = append(body, "\n"...)
 
 	w.WriteHeader(http.StatusInternalServerError)
 	_, err = w.Write(body)

@@ -1,0 +1,7 @@
+{
+  "errors": [
+    {
+      "detail": "request to /members/me/cards returned status code 404"
+    }
+  ]
+}
