@@ -97,7 +97,7 @@ func (f *fakeTrelloClient) SetListsOnBoardError(boardID string, err error) {
 	f.listsOnBoardErrors[boardID] = err
 }
 
-func aFakeTrelloClient() *fakeTrelloClient {
+func newFakeTrelloClient() *fakeTrelloClient {
 	return &fakeTrelloClient{
 		cardsOnLists:       make(map[string][]trello.Card),
 		listsOnBoards:      make(map[string][]trello.List),
@@ -110,7 +110,7 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 	cardURL, _ := url.Parse("https://example.com")
 	ownedCard := trello.Card{ID: "an id", Name: "a name", URL: *cardURL, BoardID: "boardId"}
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.AddOwnedCard(&ownedCard)
 
 	fetcher := Fetcher{fakeClient, testConfig()}
@@ -134,7 +134,7 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 func TestErrorWithOwnedCardsReturnsError(t *testing.T) {
 	expectedError := fmt.Errorf("an error")
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.SetOwnedCardsError(expectedError)
 
 	fetcher := Fetcher{fakeClient, testConfig()}
@@ -151,7 +151,7 @@ func TestErrorWithOwnedCardsReturnsError(t *testing.T) {
 func TestCardsInNextActionsListAreReturnedAsActions(t *testing.T) {
 	nextActionsCard := trello.Card{ID: "an id", Name: "a name", BoardID: "boardId"}
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.AddCardOnList("nextActionsListId", &nextActionsCard)
 
 	fetcher := Fetcher{fakeClient, testConfig()}
@@ -175,7 +175,7 @@ func TestCardsInNextActionsListAreReturnedAsActions(t *testing.T) {
 func TestErrorWithCardsOnListReturnsError(t *testing.T) {
 	expectedError := fmt.Errorf("an error")
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.SetCardsOnListError("nextActionsListId", expectedError)
 
 	fetcher := Fetcher{fakeClient, testConfig()}
@@ -192,7 +192,7 @@ func TestErrorWithCardsOnListReturnsError(t *testing.T) {
 func TestErrorWithCardsOnProjectsListReturnsError(t *testing.T) {
 	expectedError := fmt.Errorf("an error")
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.SetCardsOnListError("projectsListId", expectedError)
 
 	fetcher := Fetcher{fakeClient, testConfig()}
@@ -209,7 +209,7 @@ func TestErrorWithCardsOnProjectsListReturnsError(t *testing.T) {
 func TestMissingDescriptionOnProjectCardReturnsError(t *testing.T) {
 	brokenProjectCard := trello.Card{ID: "an id", Name: "a name", Description: "invalid"}
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.AddCardOnList("projectsListId", &brokenProjectCard)
 
 	fetcher := Fetcher{fakeClient, testConfig()}
@@ -227,7 +227,7 @@ func TestErrorWithListsOnBoardReturnsError(t *testing.T) {
 	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/broken/a-broken-card"}
 	expectedError := fmt.Errorf("an error")
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.AddCardOnList("projectsListId", &projectCard)
 	fakeClient.SetListsOnBoardError("broken", expectedError)
 
@@ -245,7 +245,7 @@ func TestErrorWithListsOnBoardReturnsError(t *testing.T) {
 func TestMissingTodoListOnProjectBoardReturnsError(t *testing.T) {
 	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/empty"}
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.AddCardOnList("projectsListId", &projectCard)
 
 	fetcher := Fetcher{fakeClient, testConfig()}
@@ -264,7 +264,7 @@ func TestErrorWithTodoListReturnsError(t *testing.T) {
 	todoList := trello.List{ID: "todoListId", Name: "Todo"}
 	expectedError := fmt.Errorf("an error")
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.AddCardOnList("projectsListId", &projectCard)
 	fakeClient.AddListOnBoard("aBoardId", &todoList)
 	fakeClient.SetCardsOnListError("todoListId", expectedError)
@@ -284,7 +284,7 @@ func TestEmptyTodoListDoesNotReturnAnAction(t *testing.T) {
 	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/aBoardId"}
 	todoList := trello.List{ID: "todoListId", Name: "Todo"}
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.AddCardOnList("projectsListId", &projectCard)
 	fakeClient.AddListOnBoard("aBoardId", &todoList)
 
@@ -303,7 +303,7 @@ func TestFirstTodoListItemsAreReturnedAsActions(t *testing.T) {
 	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/aBoardId"}
 	todoList := trello.List{ID: "todoListId", Name: "Todo"}
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.AddCardOnList("projectsListId", &projectCard)
 	fakeClient.AddListOnBoard("aBoardId", &todoList)
 	fakeClient.AddCardOnList("todoListId", &trello.Card{ID: "an id", Name: "a name", BoardID: "boardId"})
@@ -331,7 +331,7 @@ func TestCardDueByDateIsAddedToActions(t *testing.T) {
 	dueBy, _ := time.Parse(time.RFC3339, "2020-02-12T16:24:00.000Z")
 	ownedCard := trello.Card{ID: "an id", Name: "a name", DueBy: &dueBy, BoardID: "boardId"}
 
-	fakeClient := aFakeTrelloClient()
+	fakeClient := newFakeTrelloClient()
 	fakeClient.AddOwnedCard(&ownedCard)
 
 	fetcher := Fetcher{fakeClient, testConfig()}
