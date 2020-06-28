@@ -25,6 +25,7 @@ func handleError(w http.ResponseWriter, err error) {
 	if err != nil {
 		panic(err)
 	}
+	body = append(body, "\n"...)
 
 	w.WriteHeader(http.StatusInternalServerError)
 	_, err = w.Write(body)
@@ -63,6 +64,6 @@ func actions(w http.ResponseWriter, req *http.Request) {
 func main() {
 	http.HandleFunc("/actions", actions)
 
-	fmt.Printf("Listening on port 8080\n")
+	fmt.Println("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

@@ -11,7 +11,7 @@ func TestFromEnvironmentReturnsValidConfig(t *testing.T) {
 
 	config, err := FromEnvironment()
 	if err != nil {
-		t.Errorf("Error returned from FromEnvironment: %s", err)
+		t.Fatalf("Error returned from FromEnvironment: %s", err)
 	}
 
 	isValidConfig := config.TrelloKey == "some key" &&

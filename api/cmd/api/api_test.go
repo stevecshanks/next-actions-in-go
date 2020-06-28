@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"path"
@@ -56,27 +59,7 @@ func TestActions(t *testing.T) {
 		t.Errorf("/actions returned status: %v", status)
 	}
 
-	expected := `{"data":[` +
-		`{"type":"actions","id":"myFirstCardId","name":"My First Card","dueBy":"2020-02-12T16:24:00Z",` +
-		`"projectName":"My Project",` +
-		`"url":"https://trello.com/c/abcd1234/10-my-first-card",` +
-		`"imageUrl":"https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"},` +
-		`{"type":"actions","id":"mySecondCardId","name":"My Second Card","dueBy":null,` +
-		`"projectName":"My Project",` +
-		`"url":"https://trello.com/c/bcde2345/11-my-second-card",` +
-		`"imageUrl":"https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"},` +
-		`{"type":"actions","id":"todoCardId","name":"Todo Card","dueBy":null,` +
-		`"projectName":"My Project",` +
-		`"url":"https://trello.com/c/cdef3456/33-my-third-card",` +
-		`"imageUrl":"https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"},` +
-		`{"type":"actions","id":"firstProjectCardId","name":"Project Card","dueBy":null,` +
-		`"projectName":"My Project",` +
-		`"url":"https://trello.com/c/fghi5678/55-my-project-card",` +
-		`"imageUrl":"https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"}` +
-		`]}` + "\n"
-	if rr.Body.String() != expected {
-		t.Errorf("/actions returned incorrect body:\nexpected: %v\nactual:   %v", expected, rr.Body.String())
-	}
+	assertResponseMatchesContractFile(t, rr.Body.Bytes(), "api_success_response.json")
 }
 
 func TestActionsErrors(t *testing.T) {
@@ -99,8 +82,27 @@ func TestActionsErrors(t *testing.T) {
 		t.Errorf("/actions returned status: %v", status)
 	}
 
-	expected := `{"errors":[{"detail":"request to /members/me/cards returned status code 404"}]}`
-	if rr.Body.String() != expected {
-		t.Errorf("/actions returned incorrect body:\nexpected: %v\nactual:   %v", expected, rr.Body.String())
+	assertResponseMatchesContractFile(t, rr.Body.Bytes(), "api_error_response.json")
+}
+
+func assertResponseMatchesContractFile(t *testing.T, response []byte, fileName string) {
+	expectedBytes, err := ioutil.ReadFile(path.Join("../../../contracts", fileName))
+	if err != nil {
+		panic(err)
+	}
+
+	var actualBytes bytes.Buffer
+	err = json.Indent(&actualBytes, response, "", "  ")
+	if err != nil {
+		t.Fatalf("Could not parse response as JSON")
+	}
+
+	if !bytes.Equal(actualBytes.Bytes(), expectedBytes) {
+		t.Errorf(
+			"Response did not match file %s:\nexpected: %v\nactual:   %v",
+			fileName,
+			string(expectedBytes),
+			actualBytes.String(),
+		)
 	}
 }

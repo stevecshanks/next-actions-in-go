@@ -14,7 +14,7 @@
     "idAttachmentCover": null,
     "idLabels": [],
     "manualCoverAttachment": false,
-    "name": "Todo Card",
+    "name": "Todo Action",
     "pos": 300000,
     "shortLink": "cdef3456",
     "isTemplate": false,
@@ -40,7 +40,7 @@
       "dueComplete": false
     },
     "dueComplete": false,
-    "due": null,
+    "due": "2020-01-15T10:29:59Z",
     "idChecklists": [],
     "idMembers": [],
     "labels": [],
