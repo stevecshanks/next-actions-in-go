@@ -3,8 +3,8 @@
     {
       "type": "actions",
       "id": "myFirstCardId",
-      "name": "My First Card",
-      "dueBy": "2020-02-12T16:24:00Z",
+      "name": "My First Action",
+      "dueBy": "2020-01-01T10:30:00Z",
       "projectName": "My Project",
       "url": "https://trello.com/c/abcd1234/10-my-first-card",
       "imageUrl": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"
@@ -12,7 +12,7 @@
     {
       "type": "actions",
       "id": "mySecondCardId",
-      "name": "My Second Card",
+      "name": "My Second Action",
       "dueBy": null,
       "projectName": "My Project",
       "url": "https://trello.com/c/bcde2345/11-my-second-card",
@@ -21,8 +21,8 @@
     {
       "type": "actions",
       "id": "todoCardId",
-      "name": "Todo Card",
-      "dueBy": null,
+      "name": "Todo Action",
+      "dueBy": "2020-01-15T10:29:59Z",
       "projectName": "My Project",
       "url": "https://trello.com/c/cdef3456/33-my-third-card",
       "imageUrl": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"
@@ -30,7 +30,7 @@
     {
       "type": "actions",
       "id": "firstProjectCardId",
-      "name": "Project Card",
+      "name": "Project Action",
       "dueBy": null,
       "projectName": "My Project",
       "url": "https://trello.com/c/fghi5678/55-my-project-card",

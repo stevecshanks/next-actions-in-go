@@ -59,7 +59,7 @@ func TestActions(t *testing.T) {
 		t.Errorf("/actions returned status: %v", status)
 	}
 
-	assertResponseMatchesFile(t, rr.Body.Bytes(), "testdata/success_response.json")
+	assertResponseMatchesContractFile(t, rr.Body.Bytes(), "api_success_response.json")
 }
 
 func TestActionsErrors(t *testing.T) {
@@ -82,11 +82,11 @@ func TestActionsErrors(t *testing.T) {
 		t.Errorf("/actions returned status: %v", status)
 	}
 
-	assertResponseMatchesFile(t, rr.Body.Bytes(), "testdata/error_response.json")
+	assertResponseMatchesContractFile(t, rr.Body.Bytes(), "api_error_response.json")
 }
 
-func assertResponseMatchesFile(t *testing.T, response []byte, fileName string) {
-	expectedBytes, err := ioutil.ReadFile(fileName)
+func assertResponseMatchesContractFile(t *testing.T, response []byte, fileName string) {
+	expectedBytes, err := ioutil.ReadFile(path.Join("../../../contracts", fileName))
 	if err != nil {
 		panic(err)
 	}

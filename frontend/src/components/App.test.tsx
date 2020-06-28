@@ -4,80 +4,46 @@ import { render, waitFor } from "@testing-library/react";
 import fetchMock from "jest-fetch-mock";
 import MockDate from "mockdate";
 import App from "./App";
+import API_SUCCESS_RESPONSE from "../../../contracts/api_success_response.json";
+import API_ERROR_RESPONSE from "../../../contracts/api_error_response.json";
 
 const NOW = new Date(2020, 0, 15, 10, 30, 0);
-const ONE_SECOND = 1000;
+const LAST_YEAR = new Date(2019, 11, 31, 10, 30, 0);
 
 beforeEach(() => MockDate.set(NOW));
 
 afterEach(() => MockDate.reset());
 
 test("renders the actions returned by the API", async () => {
-  const response = {
-    data: [
-      {
-        type: "actions",
-        id: "12345",
-        name: "An action",
-        dueBy: null,
-      },
-    ],
-  };
-  fetchMock.mockResponse(JSON.stringify(response));
-
-  const { findByText } = render(<App />);
-
-  const action = await findByText("An action");
-  expect(action).toBeInTheDocument();
-});
-
-test("correctly handles due by datetimes from the API", async () => {
-  const response = {
-    data: [
-      {
-        type: "actions",
-        id: "12345",
-        name: "An action",
-        dueBy: "2020-01-15T10:30:00Z",
-      },
-      {
-        type: "actions",
-        id: "23456",
-        name: "An action with no due date",
-        dueBy: null,
-      },
-    ],
-  };
-  fetchMock.mockResponse(JSON.stringify(response));
+  fetchMock.mockResponse(JSON.stringify(API_SUCCESS_RESPONSE));
 
   const { findByText, queryByText } = render(<App />);
 
-  const action = await findByText("1/15/2020");
-  expect(action).toBeInTheDocument();
+  const firstAction = await findByText("My First Action");
+  expect(firstAction).toBeInTheDocument();
+  const secondAction = queryByText("My Second Action");
+  expect(secondAction).toBeInTheDocument();
+  const todoAction = queryByText("Todo Action");
+  expect(todoAction).toBeInTheDocument();
+  const projectAction = queryByText("Project Action");
+  expect(projectAction).toBeInTheDocument();
+});
+
+test("correctly handles due by datetimes from the API", async () => {
+  fetchMock.mockResponse(JSON.stringify(API_SUCCESS_RESPONSE));
+
+  const { findByText, queryByText } = render(<App />);
+
+  const firstAction = await findByText("1/1/2020");
+  expect(firstAction).toBeInTheDocument();
+  const secondAction = queryByText("1/15/2020");
+  expect(secondAction).toBeInTheDocument();
   const badDueDate = queryByText("1/1/1970");
   expect(badDueDate).not.toBeInTheDocument();
 });
 
 test("includes the count of overdue and due soon actions in the window title", async () => {
-  const dueSoon = new Date(NOW.getTime() - ONE_SECOND);
-
-  const response = {
-    data: [
-      {
-        type: "actions",
-        id: "12345",
-        name: "An overdue action",
-        dueBy: "2000-01-01T10:30:00Z",
-      },
-      {
-        type: "actions",
-        id: "23456",
-        name: "A due soon action",
-        dueBy: dueSoon.toISOString(),
-      },
-    ],
-  };
-  fetchMock.mockResponse(JSON.stringify(response));
+  fetchMock.mockResponse(JSON.stringify(API_SUCCESS_RESPONSE));
 
   render(<App />);
 
@@ -85,19 +51,13 @@ test("includes the count of overdue and due soon actions in the window title", a
 });
 
 test("does not include action count in title if no overdue or due soon actions", async () => {
-  const response = {
-    data: [
-      {
-        type: "actions",
-        id: "12345",
-        name: "An action",
-      },
-    ],
-  };
-  fetchMock.mockResponse(JSON.stringify(response));
+  fetchMock.mockResponse(JSON.stringify(API_SUCCESS_RESPONSE));
+  MockDate.set(LAST_YEAR);
 
-  render(<App />);
+  const { findByText } = render(<App />);
 
+  // Wait for actions to actually render, otherwise the test just picks up the initial title
+  await findByText("My First Action");
   await waitFor(() => expect(document.title).toEqual("Next Actions"));
 });
 
@@ -111,22 +71,12 @@ test("renders an error if the API call fails", async () => {
 });
 
 test("renders errors returned from the API", async () => {
-  const response = {
-    errors: [
-      {
-        detail: "a bad thing",
-      },
-      {
-        detail: "another bad thing",
-      },
-    ],
-  };
-  fetchMock.mockResponse(JSON.stringify(response), { status: 500 });
+  fetchMock.mockResponse(JSON.stringify(API_ERROR_RESPONSE), { status: 500 });
 
   const { findByText } = render(<App />);
 
-  const error = await findByText("An error occurred: a bad thing");
+  const error = await findByText(
+    "An error occurred: request to /members/me/cards returned status code 404"
+  );
   expect(error).toBeInTheDocument();
-  const anotherError = await findByText("An error occurred: another bad thing");
-  expect(anotherError).toBeInTheDocument();
 });

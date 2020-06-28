@@ -22,11 +22,12 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 	if len(cards) != 2 {
 		t.Fatalf("OwnedCards returned %d cards, expected %d", len(cards), 2)
 	}
-	expectedDueBy, _ := time.Parse(time.RFC3339, "2020-02-12T16:24:00.000Z")
+
+	expectedDueBy, _ := time.Parse(time.RFC3339, "2020-01-01T10:30:00.000Z")
 	expectedURL1, _ := url.Parse("https://trello.com/c/abcd1234/10-my-first-card")
 	expectedCard1 := Card{
 		ID:          "myFirstCardId",
-		Name:        "My First Card",
+		Name:        "My First Action",
 		Description: "",
 		DueBy:       &expectedDueBy,
 		URL:         *expectedURL1,
@@ -38,7 +39,7 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 	expectedURL2, _ := url.Parse("https://trello.com/c/bcde2345/11-my-second-card")
 	expectedCard2 := Card{
 		ID:          "mySecondCardId",
-		Name:        "My Second Card",
+		Name:        "My Second Action",
 		Description: "",
 		URL:         *expectedURL2,
 		BoardID:     "myBoardId",
@@ -63,11 +64,14 @@ func TestClientCardsOnList(t *testing.T) {
 	if len(cards) != 1 {
 		t.Fatalf("CardsOnList returned %d cards, expected %d", len(cards), 2)
 	}
+
+	expectedDueBy, _ := time.Parse(time.RFC3339, "2020-01-15T10:29:59.000Z")
 	expectedURL, _ := url.Parse("https://trello.com/c/cdef3456/33-my-third-card")
 	expectedCard1 := Card{
 		ID:          "todoCardId",
-		Name:        "Todo Card",
+		Name:        "Todo Action",
 		Description: "a description",
+		DueBy:       &expectedDueBy,
 		URL:         *expectedURL,
 		BoardID:     "myBoardId",
 	}
