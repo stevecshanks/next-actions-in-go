@@ -1,41 +1,35 @@
-.PHONY: dev prod build push deploy install test lint test_api lint_api test_frontend lint_frontend
+SUBDIRS = api frontend
 
+.PHONY: dev
 dev:
 	source .env && docker-compose up
 
+.PHONY: prod
 prod: build
 	docker-compose -f docker-compose-production.yml
 
+.PHONY: build
 build:
 	docker-compose -f docker-compose-production.yml -f docker-compose-production-build.yml build
 
+.PHONY: push
 push:
 	echo ${DOCKER_HUB_TOKEN} | docker login -u stevecshanks --password-stdin
 	docker-compose -f docker-compose-production.yml -f docker-compose-production-build.yml push
 
+.PHONY: deploy
 deploy:
 	echo ${DOCKER_HUB_TOKEN} | ssh docker-deploy@${DOCKER_SERVER} "docker login -u stevecshanks --password-stdin"
 	ssh docker-deploy@${DOCKER_SERVER} "docker-compose -f docker-compose-production.yml down --rmi all --remove-orphans || true"
 	scp docker-compose-production.yml docker-deploy@${DOCKER_SERVER}:~/docker-compose-production.yml
 	ssh docker-deploy@${DOCKER_SERVER} "source .env && docker-compose -f docker-compose-production.yml pull && docker-compose -f docker-compose-production.yml up --no-build -d"
 
-install: frontend/node_modules
+.PHONY: test
+test: $(SUBDIRS)
 
-frontend/node_modules: frontend/package.json
-	cd frontend && npm install && touch -m node_modules
+.PHONY: lint
+lint: $(SUBDIRS)
 
-test: test_api test_frontend
-
-lint: lint_api lint_frontend
-
-test_api:
-	cd api && go test -race ./...
-
-lint_api:
-	cd api && golangci-lint run
-
-test_frontend: install
-	cd frontend && npm run compile && CI=true npm test
-
-lint_frontend: install
-	cd frontend && npm run lint
+.PHONY: $(SUBDIRS)
+$(SUBDIRS):
+	$(MAKE) -C $@ $(MAKECMDGOALS)
