@@ -42,12 +42,15 @@ const App: React.FC = () => {
   const [errorMessages, setErrorMessages] = useState<String[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const updateNotificationCount = () => {
+  const updateNotifications = () => {
     const notificationCount = actions.filter(
       (action) => action.isOverdue() || action.isDueSoon()
     ).length;
     const notificationText = notificationCount ? `(${notificationCount}) ` : "";
-    document.title = `${notificationText}Next Actions`;
+
+    const errorNotification = errorMessages.length ? "[ERROR] " : "";
+
+    document.title = `${errorNotification}${notificationText}Next Actions`;
   };
 
   useEffect(() => {
@@ -70,7 +73,7 @@ const App: React.FC = () => {
     setInterval(fetchActions, ONE_HOUR);
   }, []);
 
-  useEffect(updateNotificationCount, [actions]);
+  useEffect(updateNotifications, [actions, errorMessages]);
 
   return (
     <>

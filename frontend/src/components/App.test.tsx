@@ -80,3 +80,11 @@ test("renders errors returned from the API", async () => {
   );
   expect(error).toBeInTheDocument();
 });
+
+test("includes an indicator in the window title when errors are returned from the API", async () => {
+  fetchMock.mockResponse(JSON.stringify(API_ERROR_RESPONSE), { status: 500 });
+
+  render(<App />);
+
+  await waitFor(() => expect(document.title).toEqual("[ERROR] Next Actions"));
+});
