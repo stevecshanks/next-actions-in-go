@@ -1,4 +1,4 @@
-package config
+package config // nolint:golint // package comment is in another file
 
 import "os"
 

@@ -1,3 +1,4 @@
+// Package trello provides a client to interact with the Trello API
 package trello
 
 import (
@@ -9,7 +10,10 @@ import (
 	"time"
 )
 
+// APIBaseURL is the base URL for the Trello API
 const APIBaseURL = "https://api.trello.com/1"
+
+// BoardBaseURL is the base URL for Trello boards
 const BoardBaseURL = "https://trello.com/b/"
 
 // OwnedCardsPath returns the path on the Trello API server where a list of owned cards can be queried
@@ -32,11 +36,11 @@ func BoardPath(boardID string) string {
 	return fmt.Sprintf("/boards/%s", boardID)
 }
 
-type URL struct {
+type urlWrapper struct {
 	url.URL
 }
 
-func (u *URL) UnmarshalJSON(data []byte) error {
+func (u *urlWrapper) UnmarshalJSON(data []byte) error {
 	var jsonURL string
 	if err := json.Unmarshal(data, &jsonURL); err != nil {
 		return err
@@ -62,10 +66,11 @@ type Card struct {
 	BoardID     string     `json:"idBoard"`
 }
 
-type CardAlias Card
+type cardAlias Card
 
+// UnmarshalJSON converts JSON data into a Card
 func (c *Card) UnmarshalJSON(data []byte) error {
-	var jsonCard JSONCard
+	var jsonCard jsonCard
 	if err := json.Unmarshal(data, &jsonCard); err != nil {
 		return err
 	}
@@ -73,13 +78,13 @@ func (c *Card) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type JSONCard struct {
-	CardAlias
-	URL URL `json:"url"`
+type jsonCard struct {
+	cardAlias
+	URL urlWrapper `json:"url"`
 }
 
-func (jc *JSONCard) Card() Card {
-	card := Card(jc.CardAlias)
+func (jc *jsonCard) Card() Card {
+	card := Card(jc.cardAlias)
 	card.URL = jc.URL.URL
 	return card
 }
@@ -107,8 +112,9 @@ type BackgroundImage struct {
 	URL url.URL `json:"-"`
 }
 
+// UnmarshalJSON converts JSON data into a BackgroundImage
 func (b *BackgroundImage) UnmarshalJSON(data []byte) error {
-	var jsonBackgroundImage JSONBackgroundImage
+	var jsonBackgroundImage jsonBackgroundImage
 	if err := json.Unmarshal(data, &jsonBackgroundImage); err != nil {
 		return err
 	}
@@ -116,8 +122,8 @@ func (b *BackgroundImage) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type JSONBackgroundImage struct {
-	URL URL `json:"url"`
+type jsonBackgroundImage struct {
+	URL urlWrapper `json:"url"`
 }
 
 // Client is used to interact with the Trello API

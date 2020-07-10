@@ -1,3 +1,4 @@
+// Package config provides an abstraction around configuration and allows creation from the environment
 package config
 
 import (
