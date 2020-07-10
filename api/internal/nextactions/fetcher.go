@@ -1,3 +1,4 @@
+// Package nextactions provides a way to fetch Next Actions from Trello
 package nextactions
 
 import (
@@ -8,18 +9,20 @@ import (
 	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 )
 
-type TrelloClient interface {
+type trelloClient interface {
 	OwnedCards() ([]trello.Card, error)
 	CardsOnList(listID string) ([]trello.Card, error)
 	ListsOnBoard(boardID string) ([]trello.List, error)
 	GetBoard(boardID string) (*trello.Board, error)
 }
 
+// Fetcher allows Next Actions to be fetched from Trello
 type Fetcher struct {
-	Client TrelloClient
+	Client trelloClient
 	Config *config.Config
 }
 
+// Fetch will fetch a list of Next Actions from Trello
 func (f *Fetcher) Fetch() ([]Action, error) {
 	allCards := make([]trello.Card, 0)
 

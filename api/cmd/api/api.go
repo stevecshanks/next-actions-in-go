@@ -1,3 +1,4 @@
+// Package main provides the API itself
 package main
 
 import (
@@ -12,16 +13,16 @@ import (
 	"github.com/stevecshanks/next-actions-in-go/api/internal/trello"
 )
 
-type APIError struct {
+type apiError struct {
 	Detail string `json:"detail"`
 }
 
 func handleError(w http.ResponseWriter, err error) {
 	fmt.Printf("Error: %s\n", err)
 
-	apiErrors := []APIError{{err.Error()}}
+	apiErrors := []apiError{{err.Error()}}
 
-	body, err := json.Marshal(map[string][]APIError{"errors": apiErrors})
+	body, err := json.Marshal(map[string][]apiError{"errors": apiErrors})
 	if err != nil {
 		panic(err)
 	}

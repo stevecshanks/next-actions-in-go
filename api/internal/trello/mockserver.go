@@ -1,4 +1,4 @@
-package trello
+package trello // nolint:golint // package comment is in another file
 
 import (
 	"io/ioutil"

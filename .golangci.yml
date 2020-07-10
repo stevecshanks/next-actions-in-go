@@ -16,6 +16,9 @@ linters-settings:
     lines: 100
     statements: 50
 
+issues:
+  include: ["EXC0002"]
+
 linters:
   disable-all: true
   enable:

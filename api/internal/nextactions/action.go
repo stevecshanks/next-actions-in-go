@@ -1,18 +1,10 @@
-package nextactions
+package nextactions // nolint:golint // package comment is in another file
 
 import (
 	"encoding/json"
 	"net/url"
 	"time"
 )
-
-type URL struct {
-	url.URL
-}
-
-func (u *URL) MarshalJSON() ([]byte, error) {
-	return json.Marshal(u.URL.String())
-}
 
 // Action represents a "next action" in GTD
 type Action struct {
@@ -24,20 +16,21 @@ type Action struct {
 	ProjectName string     `json:"projectName"`
 }
 
-type ActionAlias Action
+type actionAlias Action
 
+// MarshalJSON returns a JSON representation of an Action
 func (a *Action) MarshalJSON() ([]byte, error) {
-	return json.Marshal(JSONAction{
-		ActionAlias: ActionAlias(*a),
+	return json.Marshal(jsonAction{
+		actionAlias: actionAlias(*a),
 		Type:        "actions",
 		URL:         a.URL.String(),
 		ImageURL:    a.ImageURL.String(),
 	})
 }
 
-type JSONAction struct {
+type jsonAction struct {
 	Type string `json:"type"` // Required by JSON-API
-	ActionAlias
+	actionAlias
 	URL      string `json:"url"`
 	ImageURL string `json:"imageUrl"`
 }

@@ -1,3 +1,4 @@
+// Package trello provides a client to interact with the Trello API
 package trello
 
 import (
@@ -6,10 +7,12 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"time"
 )
 
+// APIBaseURL is the base URL for the Trello API
 const APIBaseURL = "https://api.trello.com/1"
+
+// BoardBaseURL is the base URL for Trello boards
 const BoardBaseURL = "https://trello.com/b/"
 
 // OwnedCardsPath returns the path on the Trello API server where a list of owned cards can be queried
@@ -30,94 +33,6 @@ func ListsOnBoardPath(boardID string) string {
 // BoardPath returns the path on the Trello API server where a board can be queried
 func BoardPath(boardID string) string {
 	return fmt.Sprintf("/boards/%s", boardID)
-}
-
-type URL struct {
-	url.URL
-}
-
-func (u *URL) UnmarshalJSON(data []byte) error {
-	var jsonURL string
-	if err := json.Unmarshal(data, &jsonURL); err != nil {
-		return err
-	}
-
-	parsedURL, err := url.Parse(jsonURL)
-	if err != nil {
-		return err
-	}
-
-	u.URL = *parsedURL
-
-	return nil
-}
-
-// Card represents a Trello card returned via the API
-type Card struct {
-	ID          string     `json:"id"`
-	Name        string     `json:"name"`
-	Description string     `json:"desc"`
-	DueBy       *time.Time `json:"due"`
-	URL         url.URL    `json:"-"`
-	BoardID     string     `json:"idBoard"`
-}
-
-type CardAlias Card
-
-func (c *Card) UnmarshalJSON(data []byte) error {
-	var jsonCard JSONCard
-	if err := json.Unmarshal(data, &jsonCard); err != nil {
-		return err
-	}
-	*c = jsonCard.Card()
-	return nil
-}
-
-type JSONCard struct {
-	CardAlias
-	URL URL `json:"url"`
-}
-
-func (jc *JSONCard) Card() Card {
-	card := Card(jc.CardAlias)
-	card.URL = jc.URL.URL
-	return card
-}
-
-// List represents a Trello list returned via the API
-type List struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
-// Board represents a Trello board returned via the API
-type Board struct {
-	ID          string      `json:"id"`
-	Name        string      `json:"name"`
-	Preferences Preferences `json:"prefs"`
-}
-
-// Preferences represents the preferences for a Trello board returned via the API
-type Preferences struct {
-	BackgroundImages []BackgroundImage `json:"backgroundImageScaled"`
-}
-
-// BackgroundImage represents the background image of a Trello board returned via the API
-type BackgroundImage struct {
-	URL url.URL `json:"-"`
-}
-
-func (b *BackgroundImage) UnmarshalJSON(data []byte) error {
-	var jsonBackgroundImage JSONBackgroundImage
-	if err := json.Unmarshal(data, &jsonBackgroundImage); err != nil {
-		return err
-	}
-	*b = BackgroundImage{jsonBackgroundImage.URL.URL}
-	return nil
-}
-
-type JSONBackgroundImage struct {
-	URL URL `json:"url"`
 }
 
 // Client is used to interact with the Trello API
