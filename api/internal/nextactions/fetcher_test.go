@@ -123,12 +123,7 @@ func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 	}
-	if len(expectedActions) != len(actions) {
-		t.Fatalf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
-	}
-	if expectedActions[0] != actions[0] {
-		t.Errorf("Incorrect actions returned, expected %+v but got %+v", expectedActions, actions)
-	}
+	assertActionsMatchExpected(t, actions, expectedActions)
 }
 
 func TestErrorWithOwnedCardsReturnsError(t *testing.T) {
@@ -164,12 +159,7 @@ func TestCardsInNextActionsListAreReturnedAsActions(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 	}
-	if len(expectedActions) != len(actions) {
-		t.Fatalf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
-	}
-	if expectedActions[0] != actions[0] {
-		t.Errorf("Incorrect actions returned, expected %+v but got %+v", expectedActions, actions)
-	}
+	assertActionsMatchExpected(t, actions, expectedActions)
 }
 
 func TestErrorWithCardsOnListReturnsError(t *testing.T) {
@@ -319,12 +309,7 @@ func TestFirstTodoListItemsAreReturnedAsActions(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 	}
-	if len(expectedActions) != len(actions) {
-		t.Fatalf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
-	}
-	if expectedActions[0] != actions[0] {
-		t.Errorf("Incorrect actions returned, expected %+v but got %+v", expectedActions, actions)
-	}
+	assertActionsMatchExpected(t, actions, expectedActions)
 }
 
 func TestCardDueByDateIsAddedToActions(t *testing.T) {
@@ -344,10 +329,16 @@ func TestCardDueByDateIsAddedToActions(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 	}
+	assertActionsMatchExpected(t, actions, expectedActions)
+}
+
+func assertActionsMatchExpected(t *testing.T, actions, expectedActions []Action) {
 	if len(expectedActions) != len(actions) {
 		t.Fatalf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
 	}
-	if expectedActions[0] != actions[0] {
-		t.Errorf("Incorrect actions returned, expected %+v but got %+v", expectedActions, actions)
+	for i := range actions {
+		if expectedActions[i] != actions[i] {
+			t.Errorf("Expected action %d to be %+v but got %+v", i, expectedActions[i], actions[i])
+		}
 	}
 }

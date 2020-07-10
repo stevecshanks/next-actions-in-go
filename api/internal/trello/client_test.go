@@ -19,9 +19,6 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 	if err != nil {
 		t.Errorf("OwnedCards returned error: %s", err)
 	}
-	if len(cards) != 2 {
-		t.Fatalf("OwnedCards returned %d cards, expected %d", len(cards), 2)
-	}
 
 	expectedDueBy, _ := time.Parse(time.RFC3339, "2020-01-01T10:30:00.000Z")
 	expectedURL1, _ := url.Parse("https://trello.com/c/abcd1234/10-my-first-card")
@@ -33,9 +30,6 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 		URL:         *expectedURL1,
 		BoardID:     "myBoardId",
 	}
-	if !cardsAreEqual(&cards[0], &expectedCard1) {
-		t.Errorf(fmt.Sprintf("OwnedCards returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))
-	}
 	expectedURL2, _ := url.Parse("https://trello.com/c/bcde2345/11-my-second-card")
 	expectedCard2 := Card{
 		ID:          "mySecondCardId",
@@ -44,9 +38,8 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 		URL:         *expectedURL2,
 		BoardID:     "myBoardId",
 	}
-	if !cardsAreEqual(&cards[1], &expectedCard2) {
-		t.Errorf(fmt.Sprintf("OwnedCards returned incorrect card, expected %+v got %+v", expectedCard2, cards[1]))
-	}
+
+	assertCardsMatchExpected(t, cards, []Card{expectedCard1, expectedCard2})
 }
 
 func TestClientCardsOnList(t *testing.T) {
@@ -61,9 +54,6 @@ func TestClientCardsOnList(t *testing.T) {
 	if err != nil {
 		t.Errorf("CardsOnList returned error: %s", err)
 	}
-	if len(cards) != 1 {
-		t.Fatalf("CardsOnList returned %d cards, expected %d", len(cards), 2)
-	}
 
 	expectedDueBy, _ := time.Parse(time.RFC3339, "2020-01-15T10:29:59.000Z")
 	expectedURL, _ := url.Parse("https://trello.com/c/cdef3456/33-my-third-card")
@@ -75,9 +65,8 @@ func TestClientCardsOnList(t *testing.T) {
 		URL:         *expectedURL,
 		BoardID:     "myBoardId",
 	}
-	if !cardsAreEqual(&cards[0], &expectedCard1) {
-		t.Errorf(fmt.Sprintf("CardsOnList returned incorrect card, expected %+v got %+v", expectedCard1, cards[0]))
-	}
+
+	assertCardsMatchExpected(t, cards, []Card{expectedCard1})
 }
 
 func TestClientListsOnBoard(t *testing.T) {
@@ -162,4 +151,15 @@ func cardsAreEqual(card, other *Card) bool {
 		((card.DueBy == nil && other.DueBy == nil) || card.DueBy.Equal(*other.DueBy)) &&
 		card.URL.String() == other.URL.String() &&
 		card.BoardID == other.BoardID)
+}
+
+func assertCardsMatchExpected(t *testing.T, cards, expectedCards []Card) {
+	if len(expectedCards) != len(cards) {
+		t.Fatalf("Unexpected number of card returned, expected %d and got %d", len(expectedCards), len(cards))
+	}
+	for i := range cards {
+		if !cardsAreEqual(&expectedCards[i], &cards[i]) {
+			t.Errorf("Expected card %d to be %+v but got %+v", i, expectedCards[i], cards[i])
+		}
+	}
 }
