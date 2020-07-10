@@ -19,10 +19,8 @@ push:
 
 .PHONY: deploy
 deploy:
-	echo ${DOCKER_HUB_TOKEN} | ssh docker-deploy@${DOCKER_SERVER} "docker login -u stevecshanks --password-stdin"
-	ssh docker-deploy@${DOCKER_SERVER} "docker-compose -f docker-compose-production.yml down --rmi all --remove-orphans || true"
-	scp docker-compose-production.yml docker-deploy@${DOCKER_SERVER}:~/docker-compose-production.yml
-	ssh docker-deploy@${DOCKER_SERVER} "source .env && docker-compose -f docker-compose-production.yml pull && docker-compose -f docker-compose-production.yml up --no-build -d"
+	scp docker-compose-production.yml docker-deploy.sh docker-deploy@${DOCKER_SERVER}:~/
+	echo ${DOCKER_HUB_TOKEN} | ssh docker-deploy@${DOCKER_SERVER} "/bin/bash docker-deploy.sh"
 
 .PHONY: test
 test: $(SUBDIRS)
