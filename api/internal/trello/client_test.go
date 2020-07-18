@@ -144,15 +144,6 @@ func TestClientHandlesHTTPErrors(t *testing.T) {
 	}
 }
 
-func cardsAreEqual(card, other *Card) bool {
-	return (card.ID == other.ID &&
-		card.Name == other.Name &&
-		card.Description == other.Description &&
-		((card.DueBy == nil && other.DueBy == nil) || card.DueBy.Equal(*other.DueBy)) &&
-		card.URL.String() == other.URL.String() &&
-		card.BoardID == other.BoardID)
-}
-
 func assertCardsMatchExpected(t *testing.T, cards, expectedCards []Card) {
 	if len(expectedCards) != len(cards) {
 		t.Fatalf("Unexpected number of card returned, expected %d and got %d", len(expectedCards), len(cards))
@@ -162,4 +153,13 @@ func assertCardsMatchExpected(t *testing.T, cards, expectedCards []Card) {
 			t.Errorf("Expected card %d to be %+v but got %+v", i, expectedCards[i], cards[i])
 		}
 	}
+}
+
+func cardsAreEqual(card, other *Card) bool {
+	return (card.ID == other.ID &&
+		card.Name == other.Name &&
+		card.Description == other.Description &&
+		((card.DueBy == nil && other.DueBy == nil) || card.DueBy.Equal(*other.DueBy)) &&
+		card.URL.String() == other.URL.String() &&
+		card.BoardID == other.BoardID)
 }

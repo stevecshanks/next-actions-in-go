@@ -42,6 +42,10 @@ func TestActions(t *testing.T) {
 		trello.BoardPath("myBoardId"),
 		trelloResponse("board_response.json"),
 	)
+	mockServer.AddFileResponse(
+		trello.BoardPath("boardWithNoImagesId"),
+		trelloResponse("board_with_no_images_response.json"),
+	)
 
 	config.SetupEnvironment("some key", "some token", "nextActionsList123", "projectsList456")
 	defer config.TeardownEnvironment()
