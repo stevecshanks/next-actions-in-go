@@ -33,7 +33,7 @@ export const NextAction: React.FC<NextActionProps> = ({ action }) => (
 
 export const NextActionSkeleton: React.FC = () => (
   <ListGroup.Item>
-    <ActionImageSkeleton />
+    <ActionImage url={null} />
     <h1>
       <Skeleton width={"30%"} />
     </h1>
@@ -41,15 +41,16 @@ export const NextActionSkeleton: React.FC = () => (
   </ListGroup.Item>
 );
 
-const ActionImage: React.FC<{ url: string }> = ({ url }) => (
-  <div
-    className="action-image"
-    style={{
-      backgroundImage: `url("${url}")`,
-    }}
-  />
-);
-
-const ActionImageSkeleton: React.FC = () => (
-  <div className="action-image-skeleton" />
-);
+const ActionImage: React.FC<{ url: string | null }> = ({ url }) => {
+  if (url === null) {
+    return <div className="action-image action-no-image" />;
+  }
+  return (
+    <div
+      className="action-image"
+      style={{
+        backgroundImage: `url("${url}")`,
+      }}
+    />
+  );
+};

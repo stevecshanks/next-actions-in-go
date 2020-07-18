@@ -92,7 +92,24 @@ test("displays the relevant image for the action", () => {
 
   const foundAction = getByText("An action with image");
 
-  expect(foundAction.innerHTML).toContain("example.jpg");
+  expect(foundAction.querySelector(".action-image")).toHaveStyle(
+    `background-image: url("example.jpg")`
+  );
+});
+
+test("displays a placeholder if the action has no image", () => {
+  const actionWithImage = buildAction({
+    name: "An action with no image",
+    imageUrl: null,
+  });
+
+  const { getByText } = render(<NextAction action={actionWithImage} />);
+
+  const foundAction = getByText("An action with no image");
+
+  expect(foundAction.querySelector(".action-image")).toHaveClass(
+    "action-no-image"
+  );
 });
 
 test("displays project name", () => {
