@@ -32,9 +32,9 @@
       "id": "firstProjectCardId",
       "name": "Project Action",
       "dueBy": null,
-      "projectName": "My Project",
+      "projectName": "Another Project",
       "url": "https://trello.com/c/fghi5678/55-my-project-card",
-      "imageUrl": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/75x100.jpg"
+      "imageUrl": null
     }
   ]
 }

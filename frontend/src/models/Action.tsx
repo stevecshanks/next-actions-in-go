@@ -2,7 +2,7 @@ export interface ActionArgs {
   id: string;
   name: string;
   url: string;
-  imageUrl: string;
+  imageUrl: string | null;
   projectName: string;
   dueBy?: Date;
 }
@@ -13,7 +13,7 @@ export class Action {
   id: string;
   name: string;
   url: string;
-  imageUrl: string;
+  imageUrl: string | null;
   projectName: string;
   dueBy?: Date;
 

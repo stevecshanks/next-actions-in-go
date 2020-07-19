@@ -3,6 +3,7 @@ package nextactions
 
 import (
 	"fmt"
+	"net/url"
 	"regexp"
 
 	"github.com/stevecshanks/next-actions-in-go/api/internal/config"
@@ -188,9 +189,17 @@ func cardsToActions(cards []trello.Card, boardsByID map[string]*trello.Board) []
 			Name:        card.Name,
 			DueBy:       card.DueBy,
 			URL:         card.URL,
-			ImageURL:    boardsByID[card.BoardID].Preferences.BackgroundImages[0].URL,
+			ImageURL:    getImageURL(card, boardsByID),
 			ProjectName: boardsByID[card.BoardID].Name,
 		})
 	}
 	return actions
+}
+
+func getImageURL(card *trello.Card, boardsByID map[string]*trello.Board) *url.URL {
+	cardImages := boardsByID[card.BoardID].Preferences.BackgroundImages
+	if len(cardImages) == 0 {
+		return nil
+	}
+	return &cardImages[0].URL
 }

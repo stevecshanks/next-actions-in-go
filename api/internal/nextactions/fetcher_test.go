@@ -17,9 +17,9 @@ func testConfig() *config.Config {
 	}
 }
 
-func testImageURL(size string) url.URL {
+func testImageURL(size string) *url.URL {
 	imageURL, _ := url.Parse(fmt.Sprintf("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/%s.jpg", size))
-	return *imageURL
+	return imageURL
 }
 
 type fakeTrelloClient struct {
@@ -29,6 +29,7 @@ type fakeTrelloClient struct {
 	ownedCardsError    error
 	cardsOnListErrors  map[string]error
 	listsOnBoardErrors map[string]error
+	boards             map[string]*trello.Board
 }
 
 func (f *fakeTrelloClient) OwnedCards() ([]trello.Card, error) {
@@ -61,16 +62,11 @@ func (f *fakeTrelloClient) ListsOnBoard(boardID string) ([]trello.List, error) {
 }
 
 func (f *fakeTrelloClient) GetBoard(boardID string) (*trello.Board, error) {
-	return &trello.Board{
-		ID:   boardID,
-		Name: "My Project",
-		Preferences: trello.Preferences{
-			BackgroundImages: []trello.BackgroundImage{
-				{URL: testImageURL("75x100")},
-				{URL: testImageURL("144x192")},
-			},
-		},
-	}, nil
+	board, ok := f.boards[boardID]
+	if !ok {
+		return nil, fmt.Errorf("board with id %s not found", boardID)
+	}
+	return board, nil
 }
 
 func (f *fakeTrelloClient) AddOwnedCard(card *trello.Card) {
@@ -83,6 +79,10 @@ func (f *fakeTrelloClient) AddCardOnList(listID string, card *trello.Card) {
 
 func (f *fakeTrelloClient) AddListOnBoard(boardID string, list *trello.List) {
 	f.listsOnBoards[boardID] = append(f.listsOnBoards[boardID], *list)
+}
+
+func (f *fakeTrelloClient) AddBoard(board *trello.Board) {
+	f.boards[board.ID] = board
 }
 
 func (f *fakeTrelloClient) SetOwnedCardsError(err error) {
@@ -98,12 +98,26 @@ func (f *fakeTrelloClient) SetListsOnBoardError(boardID string, err error) {
 }
 
 func newFakeTrelloClient() *fakeTrelloClient {
-	return &fakeTrelloClient{
+	client := &fakeTrelloClient{
 		cardsOnLists:       make(map[string][]trello.Card),
 		listsOnBoards:      make(map[string][]trello.List),
 		cardsOnListErrors:  make(map[string]error),
 		listsOnBoardErrors: make(map[string]error),
+		boards:             make(map[string]*trello.Board),
 	}
+
+	client.AddBoard(&trello.Board{
+		ID:   "boardId",
+		Name: "My Project",
+		Preferences: trello.Preferences{
+			BackgroundImages: []trello.BackgroundImage{
+				{URL: *testImageURL("75x100")},
+				{URL: *testImageURL("144x192")},
+			},
+		},
+	})
+
+	return client
 }
 
 func TestOwnedCardsAreReturnedAsActions(t *testing.T) {
@@ -332,13 +346,50 @@ func TestCardDueByDateIsAddedToActions(t *testing.T) {
 	assertActionsMatchExpected(t, actions, expectedActions)
 }
 
+func TestBoardsWithNoBackgroundImagesCanStillReturnActions(t *testing.T) {
+	ownedCard := trello.Card{ID: "an id", Name: "a name", BoardID: "boardWithNoBackgroundId"}
+
+	boardWithNoBackgroundID := trello.Board{
+		ID:   "boardWithNoBackgroundId",
+		Name: "My Project",
+		Preferences: trello.Preferences{
+			BackgroundImages: nil,
+		},
+	}
+
+	fakeClient := newFakeTrelloClient()
+	fakeClient.AddOwnedCard(&ownedCard)
+	fakeClient.AddBoard(&boardWithNoBackgroundID)
+
+	fetcher := Fetcher{fakeClient, testConfig()}
+	actions, err := fetcher.Fetch()
+
+	expectedActions := []Action{
+		{ID: "an id", Name: "a name", ProjectName: "My Project"},
+	}
+
+	if err != nil {
+		t.Errorf("Unexpected error: %s", err)
+	}
+	assertActionsMatchExpected(t, actions, expectedActions)
+}
+
 func assertActionsMatchExpected(t *testing.T, actions, expectedActions []Action) {
 	if len(expectedActions) != len(actions) {
 		t.Fatalf("Unexpected number of actions returned, expected %d and got %d", len(expectedActions), len(actions))
 	}
 	for i := range actions {
-		if expectedActions[i] != actions[i] {
+		if !actionsAreEqual(&expectedActions[i], &actions[i]) {
 			t.Errorf("Expected action %d to be %+v but got %+v", i, expectedActions[i], actions[i])
 		}
 	}
+}
+
+func actionsAreEqual(action, other *Action) bool {
+	return (action.ID == other.ID &&
+		action.Name == other.Name &&
+		((action.DueBy == nil && other.DueBy == nil) || action.DueBy.Equal(*other.DueBy)) &&
+		action.URL.String() == other.URL.String() &&
+		((action.ImageURL == nil && other.ImageURL == nil) || action.ImageURL.String() == other.ImageURL.String()) &&
+		action.ProjectName == other.ProjectName)
 }
