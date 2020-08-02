@@ -15,7 +15,7 @@ FROM nginx:1.17
 RUN apt-get update \
     && apt-get install -y software-properties-common gnupg \
     && add-apt-repository ppa:certbot/certbot \
-    && apt-get install -y certbot python-certbot-nginx
+    && apt-get install -y certbot python-certbot-nginx cron
 
 COPY --from=build /app/build /usr/share/nginx/html
 
