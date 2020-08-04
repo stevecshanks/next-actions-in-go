@@ -10,12 +10,19 @@ RUN npm ci
 
 RUN npm run build
 
-FROM nginx:1.17
+FROM nginx:1.19
 
 RUN apt-get update \
     && apt-get install -y software-properties-common gnupg \
     && add-apt-repository ppa:certbot/certbot \
     && apt-get install -y certbot python-certbot-nginx cron
+
+# Because Certbot runs in the background, and is the process controlling Nginx, the logs to /dev/stdout won't get
+# picked up by Docker. Need to link them to something that Docker will pick up.
+RUN unlink /var/log/nginx/access.log \
+    && unlink /var/log/nginx/error.log \
+    && ln -sf /proc/1/fd/1 /var/log/nginx/access.log \
+    && ln -sf /proc/1/fd/1 /var/log/nginx/error.log
 
 COPY --from=build /app/build /usr/share/nginx/html
 
