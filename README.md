@@ -16,7 +16,7 @@ make test
 
 ## Running in production
 
-The master branch will continuously deploy from CircleCI to the specified server. Requires the server to have `docker-compose` installed, and a `docker-deploy` user with an SSH key:
+The `main` branch will continuously deploy from CircleCI to the specified server. Requires the server to have `docker-compose` installed, and a `docker-deploy` user with an SSH key:
 
 ```
 adduser --disabled-password docker-deploy
