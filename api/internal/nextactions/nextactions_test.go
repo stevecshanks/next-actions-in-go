@@ -210,8 +210,8 @@ func TestErrorWithCardsOnProjectsListReturnsError(t *testing.T) {
 	}
 }
 
-func TestMissingDescriptionOnProjectCardReturnsError(t *testing.T) {
-	brokenProjectCard := trello.Card{ID: "an id", Name: "a name", Description: "invalid"}
+func TestInvalidNameOnProjectCardReturnsError(t *testing.T) {
+	brokenProjectCard := trello.Card{ID: "an id", Name: "invalid"}
 
 	fakeClient := newFakeTrelloClient()
 	fakeClient.AddCardOnList("projectsListId", &brokenProjectCard)
@@ -228,7 +228,7 @@ func TestMissingDescriptionOnProjectCardReturnsError(t *testing.T) {
 }
 
 func TestErrorWithListsOnBoardReturnsError(t *testing.T) {
-	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/broken/a-broken-card"}
+	projectCard := trello.Card{ID: "an id", Name: "https://trello.com/b/broken/a-broken-card"}
 	expectedError := fmt.Errorf("an error")
 
 	fakeClient := newFakeTrelloClient()
@@ -247,7 +247,7 @@ func TestErrorWithListsOnBoardReturnsError(t *testing.T) {
 }
 
 func TestMissingTodoListOnProjectBoardReturnsError(t *testing.T) {
-	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/empty"}
+	projectCard := trello.Card{ID: "an id", Name: "https://trello.com/b/empty"}
 
 	fakeClient := newFakeTrelloClient()
 	fakeClient.AddCardOnList("projectsListId", &projectCard)
@@ -264,7 +264,7 @@ func TestMissingTodoListOnProjectBoardReturnsError(t *testing.T) {
 }
 
 func TestErrorWithTodoListReturnsError(t *testing.T) {
-	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/aBoardId"}
+	projectCard := trello.Card{ID: "an id", Name: "https://trello.com/b/aBoardId"}
 	todoList := trello.List{ID: "todoListId", Name: "Todo"}
 	expectedError := fmt.Errorf("an error")
 
@@ -285,7 +285,7 @@ func TestErrorWithTodoListReturnsError(t *testing.T) {
 }
 
 func TestEmptyTodoListDoesNotReturnAnAction(t *testing.T) {
-	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/aBoardId"}
+	projectCard := trello.Card{ID: "an id", Name: "https://trello.com/b/aBoardId"}
 	todoList := trello.List{ID: "todoListId", Name: "Todo"}
 
 	fakeClient := newFakeTrelloClient()
@@ -304,7 +304,7 @@ func TestEmptyTodoListDoesNotReturnAnAction(t *testing.T) {
 }
 
 func TestFirstTodoListItemsAreReturnedAsActions(t *testing.T) {
-	projectCard := trello.Card{ID: "an id", Name: "a name", Description: "https://trello.com/b/aBoardId"}
+	projectCard := trello.Card{ID: "an id", Name: "https://trello.com/b/aBoardId"}
 	todoList := trello.List{ID: "todoListId", Name: "Todo"}
 
 	fakeClient := newFakeTrelloClient()

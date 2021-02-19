@@ -28,12 +28,11 @@ func (u *urlWrapper) UnmarshalJSON(data []byte) error {
 
 // Card represents a Trello card returned via the API
 type Card struct {
-	ID          string     `json:"id"`
-	Name        string     `json:"name"`
-	Description string     `json:"desc"`
-	DueBy       *time.Time `json:"due"`
-	URL         url.URL    `json:"-"`
-	BoardID     string     `json:"idBoard"`
+	ID      string     `json:"id"`
+	Name    string     `json:"name"`
+	DueBy   *time.Time `json:"due"`
+	URL     url.URL    `json:"-"`
+	BoardID string     `json:"idBoard"`
 }
 
 type cardAlias Card
