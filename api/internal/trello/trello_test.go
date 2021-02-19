@@ -23,20 +23,18 @@ func TestClientOwnedCardsReturnsExpectedResponse(t *testing.T) {
 	expectedDueBy, _ := time.Parse(time.RFC3339, "2020-01-01T10:30:00.000Z")
 	expectedURL1, _ := url.Parse("https://trello.com/c/abcd1234/10-my-first-card")
 	expectedCard1 := Card{
-		ID:          "myFirstCardId",
-		Name:        "My First Action",
-		Description: "",
-		DueBy:       &expectedDueBy,
-		URL:         *expectedURL1,
-		BoardID:     "myBoardId",
+		ID:      "myFirstCardId",
+		Name:    "My First Action",
+		DueBy:   &expectedDueBy,
+		URL:     *expectedURL1,
+		BoardID: "myBoardId",
 	}
 	expectedURL2, _ := url.Parse("https://trello.com/c/bcde2345/11-my-second-card")
 	expectedCard2 := Card{
-		ID:          "mySecondCardId",
-		Name:        "My Second Action",
-		Description: "",
-		URL:         *expectedURL2,
-		BoardID:     "myBoardId",
+		ID:      "mySecondCardId",
+		Name:    "My Second Action",
+		URL:     *expectedURL2,
+		BoardID: "myBoardId",
 	}
 
 	assertCardsMatchExpected(t, cards, []Card{expectedCard1, expectedCard2})
@@ -58,12 +56,11 @@ func TestClientCardsOnList(t *testing.T) {
 	expectedDueBy, _ := time.Parse(time.RFC3339, "2020-01-15T10:29:59.000Z")
 	expectedURL, _ := url.Parse("https://trello.com/c/cdef3456/33-my-third-card")
 	expectedCard1 := Card{
-		ID:          "todoCardId",
-		Name:        "Todo Action",
-		Description: "a description",
-		DueBy:       &expectedDueBy,
-		URL:         *expectedURL,
-		BoardID:     "myBoardId",
+		ID:      "todoCardId",
+		Name:    "Todo Action",
+		DueBy:   &expectedDueBy,
+		URL:     *expectedURL,
+		BoardID: "myBoardId",
 	}
 
 	assertCardsMatchExpected(t, cards, []Card{expectedCard1})
@@ -158,7 +155,6 @@ func assertCardsMatchExpected(t *testing.T, cards, expectedCards []Card) {
 func cardsAreEqual(card, other *Card) bool {
 	return (card.ID == other.ID &&
 		card.Name == other.Name &&
-		card.Description == other.Description &&
 		((card.DueBy == nil && other.DueBy == nil) || card.DueBy.Equal(*other.DueBy)) &&
 		card.URL.String() == other.URL.String() &&
 		card.BoardID == other.BoardID)

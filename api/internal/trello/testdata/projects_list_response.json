@@ -4,10 +4,8 @@
     "checkItemStates": null,
     "closed": false,
     "dateLastActivity": "2020-03-06T11:09:40.297Z",
-    "desc": "https://trello.com/b/projectBoard789/my-project",
-    "descData": {
-      "emoji": {}
-    },
+    "desc": "",
+    "descData": null,
     "dueReminder": null,
     "idBoard": "123456789012345678901234",
     "idList": "123456789012345678901234",
@@ -16,10 +14,11 @@
     "idAttachmentCover": null,
     "idLabels": [],
     "manualCoverAttachment": false,
-    "name": "My Project",
+    "name": "https://trello.com/b/projectBoard789/my-project",
     "pos": 5521664,
     "shortLink": "defg4567",
     "isTemplate": false,
+    "cardRole": "board",
     "badges": {
       "attachmentsByType": {
         "trello": {
@@ -48,7 +47,7 @@
     "labels": [],
     "shortUrl": "https://trello.com/c/defg4567",
     "subscribed": false,
-    "url": "https://trello.com/c/defg4567/1-my-project",
+    "url": "https://trello.com/c/defg4567/1-https-trellocom-b-projectBoard789-my-project",
     "cover": {
       "idAttachment": null,
       "color": null,

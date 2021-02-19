@@ -164,9 +164,9 @@ func getProjectBoardID(projectCard *trello.Card) (string, error) {
 		return "", err
 	}
 
-	matches := boardIDRegex.FindStringSubmatch(projectCard.Description)
+	matches := boardIDRegex.FindStringSubmatch(projectCard.Name)
 	if len(matches) != 2 {
-		return "", fmt.Errorf("could not parse board ID from description on card %s", projectCard.Name)
+		return "", fmt.Errorf("could not parse board ID from card name %s", projectCard.Name)
 	}
 	return matches[1], nil
 }
