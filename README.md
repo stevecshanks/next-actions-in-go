@@ -23,13 +23,13 @@ adduser --disabled-password docker-deploy
 usermod -aG docker docker-deploy
 
 su docker-deploy
-ssh-keygen -t rsa
-cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys
+ssh-keygen -t ed25519
+cp ~/.ssh/id_ed25519.pub ~/.ssh/authorized_keys
 
-cat ~/.ssh/id_rsa
+cat ~/.ssh/id_ed25519
 ```
 
-Copy this private key and add it to CircleCI settings for the project.
+Copy this private key and add it to CircleCI settings for the project as an Additional SSH Key, with the hostname set to the server you want to deploy to.
 
 You'll also need to set some environment variables in CircleCI:
 
