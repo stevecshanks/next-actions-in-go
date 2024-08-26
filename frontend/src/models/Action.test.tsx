@@ -66,3 +66,19 @@ test("actions due in a day are not due soon", () => {
 
   expect(action.isDueSoon()).toBeFalsy();
 });
+
+test("actions due at very end of week are due this week", () => {
+  const action = buildAction({
+    dueBy: new Date(new Date(2020, 0, 19, 23, 59, 59)),
+  });
+
+  expect(action.isDueThisWeek()).toBeTruthy();
+});
+
+test("actions due at very beginning of next week are not due this week", () => {
+  const action = buildAction({
+    dueBy: new Date(new Date(2020, 0, 20, 0, 0, 0)),
+  });
+
+  expect(action.isDueThisWeek()).toBeFalsy();
+});

@@ -41,4 +41,19 @@ export class Action {
     }
     return this.dueBy.getTime() < Date.now() + TWENTY_FOUR_HOURS;
   }
+
+  isDueThisWeek(): boolean {
+    if (!this.dueBy) {
+      return false;
+    }
+    return this.dueBy.getTime() <= endOfCurrentWeek().getTime();
+  }
 }
+
+const endOfCurrentWeek = (): Date => {
+  const today = new Date();
+  const mondayDate = today.getDate() - today.getDay() + 1;
+  const sundayDate = new Date(today.setDate(mondayDate + 6));
+  sundayDate.setHours(23, 59, 59, 999);
+  return sundayDate;
+};

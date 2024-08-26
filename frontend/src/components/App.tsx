@@ -82,7 +82,15 @@ const App: React.FC = () => {
           {message}
         </Alert>
       ))}
-      <NextActionsList actions={actions} isLoading={isLoading} />
+      <NextActionsList
+        actions={actions.filter((a) => a.isDueThisWeek())}
+        isLoading={isLoading}
+      />
+      <hr />
+      <NextActionsList
+        actions={actions.filter((a) => !a.isDueThisWeek())}
+        isLoading={isLoading}
+      />
     </>
   );
 };
